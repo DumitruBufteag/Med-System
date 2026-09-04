@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { RotateCcw } from 'lucide-react';
 import type { ClinicFilters, Specialty } from '../../types';
-import { CITIES, CLINIC_TYPE_LABELS } from '../../types';
-import { formatPrice } from '../../lib/utils';
+import { CITIES, CLINIC_TYPES } from '../../types';
+import { formatPrice, getClinicTypeLabel } from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Dropdown from './Dropdown';
 
@@ -35,7 +35,7 @@ export default function ClinicFiltersPanel({
   const typeOptions = useMemo(
     () => [
       { value: 'all', label: t('allTypes') },
-      ...Object.entries(CLINIC_TYPE_LABELS).map(([value, label]) => ({ value, label })),
+      ...CLINIC_TYPES.map((type) => ({ value: type, label: getClinicTypeLabel(type, t) })),
     ],
     [t],
   );

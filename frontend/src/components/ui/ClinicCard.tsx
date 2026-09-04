@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Clock, MapPin, Plus, Star } from 'lucide-react';
 import type { Clinic } from '../../types';
-import { CLINIC_TYPE_LABELS } from '../../types';
-import { formatPrice, formatRating } from '../../lib/utils';
+import {
+  cn,
+  formatPrice,
+  formatRating,
+  getClinicTypeLabel,
+  isClinicOpenNow,
+  translateWorkingHours,
+} from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useNow } from '../../hooks';
 import ClinicLogo from './ClinicLogo';
 
 interface ClinicCardProps {
@@ -13,7 +20,9 @@ interface ClinicCardProps {
 }
 
 export default function ClinicCard({ clinic, specialtyNames }: ClinicCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const now = useNow();
+  const isOpen = isClinicOpenNow(clinic.workingHours, now);
   const visibleSpecialties = clinic.specialties.slice(0, 3);
   const hiddenCount = clinic.specialties.length - visibleSpecialties.length;
 
@@ -28,7 +37,7 @@ export default function ClinicCard({ clinic, specialtyNames }: ClinicCardProps) 
       >
         <ClinicLogo clinic={clinic} />
         <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-surface-700">
-          {CLINIC_TYPE_LABELS[clinic.type]}
+          {getClinicTypeLabel(clinic.type, t)}
         </span>
 
         {clinic.hasEmergency && (
@@ -56,13 +65,19 @@ export default function ClinicCard({ clinic, specialtyNames }: ClinicCardProps) 
             <MapPin size={15} className="shrink-0 text-surface-300" />
             {clinic.city}, {clinic.address}
           </li>
-          <li className="flex items-center gap-2">
-            <Clock size={15} className="shrink-0 text-surface-300" />
-            {clinic.workingHours.label}
-            <span
-              className={clinic.workingHours.isOpenNow ? 'badge-success ml-auto' : 'badge-muted ml-auto'}
-            >
-              {clinic.workingHours.isOpenNow ? t('openNow') : t('closed')}
+          <li className="flex flex-col items-start gap-1.5">
+            <span className="flex items-center gap-2">
+              <Clock size={15} className="shrink-0 text-surface-300" />
+              {translateWorkingHours(clinic.workingHours.label, language)}
+            </span>
+            <span className={cn('gap-1.5', isOpen ? 'badge-success' : 'badge-muted')}>
+              <span
+                className={cn(
+                  'h-1.5 w-1.5 shrink-0 rounded-full',
+                  isOpen ? 'bg-success-500' : 'bg-surface-400',
+                )}
+              />
+              {isOpen ? t('openNow') : t('closed')}
             </span>
           </li>
         </ul>

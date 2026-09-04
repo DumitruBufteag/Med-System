@@ -7,6 +7,7 @@ import {
 } from 'react';
 import type { RegisterDTO, User } from '../types';
 import { loginUser, logoutUser, registerUser, restoreSession } from '../services/authService';
+import { translate } from '../i18n';
 
 interface AuthContextType {
   user: User | null;
@@ -14,7 +15,8 @@ interface AuthContextType {
   /** True while a login or register request is in flight. */
   isSubmitting: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  /** Resolves to the signed-in user, or `null` on failure — lets callers branch on role. */
+  login: (email: string, password: string) => Promise<User | null>;
   register: (dto: RegisterDTO) => Promise<boolean>;
   logout: () => void;
   /** Replaces the session user after a profile edit. */
@@ -39,11 +41,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (result.success && result.user) {
       setUser(result.user);
-      return true;
+      return result.user;
     }
 
-    setError(result.error ?? 'Autentificare eșuată.');
-    return false;
+    setError(result.error ?? translate('errLoginFailedGeneric'));
+    return null;
   }, []);
 
   const register = useCallback(async (dto: RegisterDTO) => {
@@ -58,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true;
     }
 
-    setError(result.error ?? 'Înregistrare eșuată.');
+    setError(result.error ?? translate('errRegisterFailedGeneric'));
     return false;
   }, []);
 

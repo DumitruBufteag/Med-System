@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ErrorStateProps {
   title: string;
@@ -8,6 +9,8 @@ interface ErrorStateProps {
 }
 
 export default function ErrorState({ title, message, onRetry, retryLabel }: ErrorStateProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-danger-500/20 bg-danger-50 px-6 py-16 text-center dark:bg-danger-500/5">
       <AlertTriangle size={40} className="mb-4 text-danger-500" />
@@ -17,7 +20,7 @@ export default function ErrorState({ title, message, onRetry, retryLabel }: Erro
       )}
       {onRetry && (
         <button type="button" className="btn-primary mt-5" onClick={onRetry}>
-          {retryLabel ?? 'Încearcă din nou'}
+          {retryLabel ?? t('retry')}
         </button>
       )}
     </div>

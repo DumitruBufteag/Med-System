@@ -26,7 +26,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    const root = document.documentElement;
+    // Dezactivăm temporar tranzițiile CSS ca toate elementele să-și
+    // schimbe culorile instant și simultan, nu eșalonat (fiecare cu
+    // propria durată de transition-colors/transition-all).
+    root.classList.add('theme-transition-off');
+    root.classList.toggle('dark', theme === 'dark');
+
+    const id = window.requestAnimationFrame(() => {
+      root.classList.remove('theme-transition-off');
+    });
+
+    return () => window.cancelAnimationFrame(id);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {

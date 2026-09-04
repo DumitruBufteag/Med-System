@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { CalendarCheck, CalendarClock, LogOut, Menu, Plus, UserRound, X } from 'lucide-react';
+import {
+  CalendarCheck,
+  CalendarClock,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Plus,
+  UserRound,
+  X,
+} from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import ThemeToggle from '../ui/ThemeToggle';
 import { cn } from '../../lib/utils';
@@ -9,7 +18,8 @@ import UserMenu from './UserMenu';
 
 export default function Navbar() {
   const { t, language, setLanguage } = useLanguage();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
@@ -60,6 +70,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setLanguage(language === 'ro' ? 'en' : 'ro')}
+            aria-label={t('switchLanguage')}
             className="rounded-full px-2.5 py-2 text-xs font-bold uppercase text-surface-500 transition-colors hover:bg-surface-100 hover:text-surface-900 dark:text-surface-400 dark:hover:bg-surface-800 dark:hover:text-white"
           >
             {language}
@@ -67,10 +78,17 @@ export default function Navbar() {
           <ThemeToggle />
           {isAuthenticated ? (
             <>
-              <Link to="/programare" className="btn-primary">
-                <CalendarCheck size={17} />
-                {t('bookAppointment')}
-              </Link>
+              {isAdmin ? (
+                <Link to="/admin" className="btn-primary">
+                  <LayoutDashboard size={17} />
+                  {t('footerAdminPanel')}
+                </Link>
+              ) : (
+                <Link to="/programare" className="btn-primary">
+                  <CalendarCheck size={17} />
+                  {t('bookAppointment')}
+                </Link>
+              )}
               <UserMenu />
             </>
           ) : (
@@ -87,7 +105,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          aria-label="Meniu"
+          aria-label={t('menu')}
           aria-expanded={isOpen}
           onClick={() => setIsOpen((open) => !open)}
           className="ml-auto rounded-lg p-2 text-surface-700 md:hidden dark:text-surface-300"
@@ -113,18 +131,27 @@ export default function Navbar() {
           <div className="mt-4 flex flex-col gap-2">
             {isAuthenticated ? (
               <>
-                <Link to="/programare" className="btn-primary" onClick={() => setIsOpen(false)}>
-                  <CalendarCheck size={17} />
-                  {t('bookAppointment')}
-                </Link>
-                <Link
-                  to="/programarile-mele"
-                  className="btn-secondary"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <CalendarClock size={17} />
-                  {t('myAppointmentsTitle')}
-                </Link>
+                {isAdmin ? (
+                  <Link to="/admin" className="btn-primary" onClick={() => setIsOpen(false)}>
+                    <LayoutDashboard size={17} />
+                    {t('footerAdminPanel')}
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/programare" className="btn-primary" onClick={() => setIsOpen(false)}>
+                      <CalendarCheck size={17} />
+                      {t('bookAppointment')}
+                    </Link>
+                    <Link
+                      to="/programarile-mele"
+                      className="btn-secondary"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <CalendarClock size={17} />
+                      {t('myAppointmentsTitle')}
+                    </Link>
+                  </>
+                )}
                 <Link to="/profil" className="btn-secondary" onClick={() => setIsOpen(false)}>
                   <UserRound size={17} />
                   {t('profileTitle')}

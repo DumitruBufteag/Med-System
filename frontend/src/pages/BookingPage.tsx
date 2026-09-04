@@ -7,7 +7,7 @@ import { useServiceData } from '../hooks';
 import { useAuth } from '../contexts/AuthContext';
 import { useClinics } from '../contexts/ClinicContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { cn, formatPrice } from '../lib/utils';
+import { cn, dateLocale, formatPrice } from '../lib/utils';
 import Dropdown from '../components/ui/Dropdown';
 import ClinicLogo from '../components/ui/ClinicLogo';
 import Spinner from '../components/ui/Spinner';
@@ -25,7 +25,7 @@ function today(): string {
 }
 
 export default function BookingPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const { clinics, isLoading: isCatalogLoading } = useClinics();
   const [searchParams] = useSearchParams();
@@ -102,7 +102,7 @@ export default function BookingPage() {
       setConfirmed(result.data);
       return;
     }
-    setError(result.error ?? 'Nu am putut înregistra programarea.');
+    setError(result.error ?? t('errCreateAppointmentGeneric'));
   }
 
   function startOver() {
@@ -142,7 +142,7 @@ export default function BookingPage() {
           <div className="flex justify-between gap-4">
             <dt className="text-surface-500">{t('date')}</dt>
             <dd className="font-semibold text-surface-900 dark:text-white">
-              {new Date(confirmed.date).toLocaleDateString('ro-MD')} · {confirmed.time}
+              {new Date(confirmed.date).toLocaleDateString(dateLocale(language))} · {confirmed.time}
             </dd>
           </div>
           <div className="flex justify-between gap-4 border-t border-surface-200 pt-3 dark:border-surface-800">

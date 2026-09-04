@@ -1,8 +1,10 @@
 import type { Review, ServiceResponse } from '../types';
-import { mockClinics, mockReviews } from '../data/mockData';
+import { mockReviews } from '../data/mockData';
 import { extractServiceError } from './apiMappers';
 import { getApiClient } from './httpClient';
 import { USE_MOCK_DATA, mockDelay } from './config';
+import { translate } from '../i18n';
+import { loadClinics } from './clinicService';
 
 /** Reviews are addressed by clinic slug, the same identifier used in the URL. */
 export async function getReviewsByClinic(slug: string): Promise<ServiceResponse<Review[]>> {
@@ -10,7 +12,7 @@ export async function getReviewsByClinic(slug: string): Promise<ServiceResponse<
 
   if (USE_MOCK_DATA) {
     await mockDelay();
-    const clinic = mockClinics.find((item) => item.slug === slug);
+    const clinic = loadClinics().find((item) => item.slug === slug);
     const reviews = clinic
       ? mockReviews
           .filter((review) => review.clinicId === clinic.id)
@@ -26,7 +28,7 @@ export async function getReviewsByClinic(slug: string): Promise<ServiceResponse<
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut încărca recenziile.'),
+      error: extractServiceError(error, translate('errLoadReviews')),
     };
   }
 }

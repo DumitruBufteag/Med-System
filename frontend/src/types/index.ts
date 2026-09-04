@@ -44,11 +44,24 @@ export interface Specialty {
   doctorsCount: number;
 }
 
-/** Opening hours of a clinic, in a display-ready form. */
+/** A block of opening hours, e.g. Mon–Fri 08:00–19:00. */
+export interface WorkingHoursPeriod {
+  /** Days this period applies to: 0 = Sunday … 6 = Saturday. */
+  days: number[];
+  /** 24h "HH:mm" time the clinic opens. */
+  start: string;
+  /** 24h "HH:mm" time the clinic closes. */
+  end: string;
+}
+
+/** Opening hours of a clinic. `isOpenNow` is derived live from the viewer's clock. */
 export interface WorkingHours {
-  /** e.g. "Lun–Vin, 08:00–20:00" or "24/7" */
+  /** e.g. "Lun–Vin, 08:00–20:00" or "Non-stop, 24/7" */
   label: string;
-  isOpenNow: boolean;
+  /** True for a clinic that never closes (e.g. round-the-clock emergency hospital). */
+  alwaysOpen?: boolean;
+  /** Time ranges the clinic is open, used to compute the live open/closed status. */
+  periods?: WorkingHoursPeriod[];
 }
 
 /** A private clinic or hospital listed in the catalogue. */
@@ -197,15 +210,43 @@ export interface CreateReviewDTO {
   comment: string;
 }
 
+/** Simplified weekly schedule captured by the admin clinic form. */
+export interface ClinicScheduleInput {
+  alwaysOpen: boolean;
+  weekdayStart: string;
+  weekdayEnd: string;
+  saturdayEnabled: boolean;
+  saturdayStart: string;
+  saturdayEnd: string;
+}
+
+/** Payload required to create or fully replace a clinic from the admin panel. */
+export interface ClinicInputDTO {
+  name: string;
+  type: ClinicType;
+  city: City;
+  address: string;
+  phone: string;
+  website?: string;
+  description: string;
+  consultationFrom: number;
+  hasEmergency: boolean;
+  acceptsInsurance: boolean;
+  /** Specialty slugs offered by this clinic. */
+  specialties: string[];
+  brandColor: string;
+  schedule: ClinicScheduleInput;
+}
+
 // ─── Constants ──────────────────────────────────────────────────
 
-/** Human-readable labels for every clinic type. */
-export const CLINIC_TYPE_LABELS: Record<ClinicType, string> = {
-  hospital: 'Spital privat',
-  medical_center: 'Centru medical',
-  specialized_clinic: 'Clinică specializată',
-  laboratory: 'Laborator',
-};
+/** Every clinic type, in display order. */
+export const CLINIC_TYPES: ClinicType[] = [
+  'hospital',
+  'medical_center',
+  'specialized_clinic',
+  'laboratory',
+];
 
 /** Every city covered by the catalogue, in display order. */
 export const CITIES: City[] = [
@@ -226,6 +267,7 @@ export const STORAGE_KEYS = {
   JWT_TOKEN: 'jwt_token',
   USERS: 'users',
   APPOINTMENTS: 'appointments',
+  CLINICS: 'clinics',
   THEME: 'theme',
   LANGUAGE: 'language',
   RECENT_SEARCHES: 'recentSearches',

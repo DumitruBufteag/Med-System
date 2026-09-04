@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarClock, ChevronDown, LogOut, UserRound } from 'lucide-react';
+import { CalendarClock, ChevronDown, LayoutDashboard, LogOut, UserRound } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getInitials } from '../../lib/utils';
@@ -73,15 +73,27 @@ export default function UserMenu() {
             {t('profileTitle')}
           </Link>
 
-          <Link
-            to="/programarile-mele"
-            role="menuitem"
-            onClick={() => setIsOpen(false)}
-            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-surface-700 transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
-          >
-            <CalendarClock size={16} />
-            {t('myAppointmentsTitle')}
-          </Link>
+          {user.role === 'admin' ? (
+            <Link
+              to="/admin"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-surface-700 transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
+            >
+              <LayoutDashboard size={16} />
+              {t('footerAdminPanel')}
+            </Link>
+          ) : (
+            <Link
+              to="/programarile-mele"
+              role="menuitem"
+              onClick={() => setIsOpen(false)}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-surface-700 transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
+            >
+              <CalendarClock size={16} />
+              {t('myAppointmentsTitle')}
+            </Link>
+          )}
 
           <button
             type="button"

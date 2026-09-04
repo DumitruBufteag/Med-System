@@ -72,6 +72,14 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-primary-500;
   }
+
+  /* La comutarea dark/light, oprim toate tranzițiile pentru o clipă
+     ca schimbarea de culori să fie instantă și simultană pe toată
+     pagina, în loc să pară eșalonată pe elemente. */
+  .theme-transition-off,
+  .theme-transition-off * {
+    transition: none !important;
+  }
 }
 
 @layer components {

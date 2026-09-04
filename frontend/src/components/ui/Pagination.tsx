@@ -30,7 +30,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Paginatio
   const pages = buildPages(page, totalPages);
 
   return (
-    <nav className="mt-10 flex items-center justify-center gap-1.5" aria-label="Paginare">
+    <nav className="mt-10 flex items-center justify-center gap-1.5" aria-label={t('pagination')}>
       <button
         type="button"
         onClick={() => onPageChange(page - 1)}

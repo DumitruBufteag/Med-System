@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle2, KeyRound, Loader2, UserRound } from 'lucide-
 import { changePassword, updateProfile } from '../services';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getInitials } from '../lib/utils';
+import { dateLocale, getInitials } from '../lib/utils';
 import FormField from '../components/ui/FormField';
 
 interface ProfileErrors {
@@ -43,7 +43,7 @@ function ErrorNote({ children }: { children: string }) {
 }
 
 export default function ProfilePage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, setUser } = useAuth();
 
   // ─── Personal details ───────────────────────────────────────
@@ -100,7 +100,7 @@ export default function ProfilePage() {
       setProfileSaved(true);
       return;
     }
-    setProfileError(result.error ?? 'Nu am putut salva modificările.');
+    setProfileError(result.error ?? t('errSaveChangesGeneric'));
   }
 
   async function handlePasswordSubmit(event: FormEvent) {
@@ -139,7 +139,7 @@ export default function ProfilePage() {
       setPasswordChanged(true);
       return;
     }
-    setPasswordError(result.error ?? 'Nu am putut schimba parola.');
+    setPasswordError(result.error ?? t('errChangePasswordGeneric'));
   }
 
   return (
@@ -176,7 +176,7 @@ export default function ProfilePage() {
               {t('memberSince')}
             </dt>
             <dd className="mt-1 font-semibold text-surface-900 dark:text-white">
-              {new Date(user.createdAt).toLocaleDateString('ro-MD')}
+              {new Date(user.createdAt).toLocaleDateString(dateLocale(language))}
             </dd>
           </div>
         </dl>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
           isPassword
           value={passwords.newPassword}
           autoComplete="new-password"
-          placeholder="Cel puțin 8 caractere"
+          placeholder={t('minPasswordPlaceholder')}
           error={passwordErrors.newPassword}
           onChange={(event) => {
             setPasswords((previous) => ({ ...previous, newPassword: event.target.value }));

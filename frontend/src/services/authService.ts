@@ -3,6 +3,7 @@ import { STORAGE_KEYS } from '../types';
 import { extractServiceError } from './apiMappers';
 import { getApiClient } from './httpClient';
 import { USE_MOCK_DATA, mockDelay } from './config';
+import { translate } from '../i18n';
 import {
   createId,
   hashPassword,
@@ -28,7 +29,7 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
     // The same message for both cases, so the form cannot be used to find out
     // which e-mail addresses are registered.
     if (!match || match.passwordHash !== (await hashPassword(password))) {
-      return { success: false, error: 'E-mail sau parolă incorectă.' };
+      return { success: false, error: translate('errLoginFailed') };
     }
 
     const user = toPublicUser(match);
@@ -44,7 +45,7 @@ export async function loginUser(email: string, password: string): Promise<AuthRe
     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
     return { success: true, user };
   } catch (error) {
-    return { success: false, error: extractServiceError(error, 'Autentificare eșuată.') };
+    return { success: false, error: extractServiceError(error, translate('errLoginFailedGeneric')) };
   }
 }
 
@@ -56,7 +57,7 @@ export async function registerUser(dto: RegisterDTO): Promise<AuthResult> {
     const normalisedEmail = dto.email.trim().toLowerCase();
 
     if (users.some((user) => user.email.toLowerCase() === normalisedEmail)) {
-      return { success: false, error: 'Există deja un cont cu acest e-mail.' };
+      return { success: false, error: translate('errEmailTaken') };
     }
 
     const stored: StoredUser = {
@@ -84,7 +85,10 @@ export async function registerUser(dto: RegisterDTO): Promise<AuthResult> {
     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
     return { success: true, user };
   } catch (error) {
-    return { success: false, error: extractServiceError(error, 'Înregistrare eșuată.') };
+    return {
+      success: false,
+      error: extractServiceError(error, translate('errRegisterFailedGeneric')),
+    };
   }
 }
 

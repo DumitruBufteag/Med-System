@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { ServiceResponse } from '../types';
+import { translate } from '../i18n';
 
 interface ServiceDataState<T> {
   data: T | undefined;
@@ -32,7 +33,7 @@ export function useServiceData<T>(load: () => Promise<ServiceResponse<T>>): Serv
       setState({
         data: result.data,
         isLoading: false,
-        error: result.success ? null : (result.error ?? 'A apărut o eroare.'),
+        error: result.success ? null : (result.error ?? translate('errUnexpected')),
       });
     });
 

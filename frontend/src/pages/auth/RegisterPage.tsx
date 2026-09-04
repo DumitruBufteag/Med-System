@@ -122,7 +122,7 @@ export default function RegisterPage() {
           type="email"
           value={form.email}
           autoComplete="email"
-          placeholder="nume@exemplu.md"
+          placeholder={t('emailPlaceholderExample')}
           error={fieldErrors.email}
           onChange={(event) => updateField('email', event.target.value)}
         />
@@ -141,7 +141,7 @@ export default function RegisterPage() {
           isPassword
           value={form.password}
           autoComplete="new-password"
-          placeholder="Cel puțin 8 caractere"
+          placeholder={t('minPasswordPlaceholder')}
           error={fieldErrors.password}
           onChange={(event) => updateField('password', event.target.value)}
         />

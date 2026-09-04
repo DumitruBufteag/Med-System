@@ -5,9 +5,17 @@
 
 export { loginUser, registerUser, logoutUser, restoreSession } from './authService';
 
-export { updateProfile, changePassword } from './userService';
+export { updateProfile, changePassword, getAllUsers, deleteUser } from './userService';
 
-export { getClinics, getFeaturedClinics, getClinicBySlug } from './clinicService';
+export {
+  getClinics,
+  getFeaturedClinics,
+  getClinicBySlug,
+  getClinicById,
+  createClinic,
+  updateClinic,
+  deleteClinic,
+} from './clinicService';
 
 export { getSpecialties } from './specialtyService';
 
@@ -19,6 +27,7 @@ export {
   createAppointment,
   cancelAppointment,
   getAppointmentsByPatient,
+  getAllAppointments,
   getTakenSlots,
   TIME_SLOTS,
 } from './appointmentService';

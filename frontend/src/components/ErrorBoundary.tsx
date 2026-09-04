@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { translate } from '../i18n';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -29,13 +30,13 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
         <AlertTriangle size={48} className="text-danger-500" />
         <h1 className="text-2xl font-bold text-surface-900 dark:text-white">
-          Ceva nu a mers bine
+          {translate('errorTitle')}
         </h1>
         <p className="max-w-md text-sm text-surface-500 dark:text-surface-400">
-          {this.state.message ?? 'A apărut o eroare neașteptată.'}
+          {this.state.message ?? translate('errUnexpected')}
         </p>
         <button type="button" className="btn-primary" onClick={() => window.location.reload()}>
-          Reîncarcă pagina
+          {translate('reloadPage')}
         </button>
       </div>
     );

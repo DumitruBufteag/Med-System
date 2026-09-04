@@ -3,6 +3,7 @@ import { STORAGE_KEYS } from '../types';
 import { extractServiceError } from './apiMappers';
 import { getApiClient } from './httpClient';
 import { USE_MOCK_DATA, mockDelay } from './config';
+import { translate } from '../i18n';
 
 /** Slots a clinic offers in a day, before removing the taken ones. */
 export const TIME_SLOTS = [
@@ -87,7 +88,7 @@ export async function getTakenSlots(
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut încărca orele disponibile.'),
+      error: extractServiceError(error, translate('errLoadSlots')),
     };
   }
 }
@@ -109,7 +110,7 @@ export async function createAppointment(
     );
 
     if (isTaken) {
-      return { success: false, error: 'Ora aleasă tocmai a fost rezervată. Alege alta.' };
+      return { success: false, error: translate('errSlotTaken') };
     }
 
     const appointment: Appointment = {
@@ -133,7 +134,7 @@ export async function createAppointment(
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut înregistra programarea.'),
+      error: extractServiceError(error, translate('errCreateAppointmentGeneric')),
     };
   }
 }
@@ -145,7 +146,7 @@ export async function cancelAppointment(id: string): Promise<ServiceResponse<App
     const appointments = readAppointments();
     const target = appointments.find((appointment) => appointment.id === id);
 
-    if (!target) return { success: false, error: 'Programarea nu a fost găsită.' };
+    if (!target) return { success: false, error: translate('errAppointmentNotFound') };
 
     const cancelled: Appointment = { ...target, status: 'cancelled' };
     writeAppointments(
@@ -161,7 +162,7 @@ export async function cancelAppointment(id: string): Promise<ServiceResponse<App
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut anula programarea.'),
+      error: extractServiceError(error, translate('errCancelAppointmentGeneric')),
     };
   }
 }
@@ -184,7 +185,29 @@ export async function getAppointmentsByPatient(
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut încărca programările.'),
+      error: extractServiceError(error, translate('errLoadAppointments')),
+    };
+  }
+}
+
+/** Admin-only: every appointment across every patient and clinic. */
+export async function getAllAppointments(): Promise<ServiceResponse<Appointment[]>> {
+  if (USE_MOCK_DATA) {
+    await mockDelay();
+    const appointments = readAppointments().sort((a, b) =>
+      `${b.date}${b.time}`.localeCompare(`${a.date}${a.time}`),
+    );
+
+    return { success: true, data: appointments };
+  }
+
+  try {
+    const response = await getApiClient().get('/api/appointments/getAll');
+    return { success: true, data: Array.isArray(response.data) ? response.data : [] };
+  } catch (error) {
+    return {
+      success: false,
+      error: extractServiceError(error, translate('errLoadAppointments')),
     };
   }
 }

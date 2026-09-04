@@ -2,11 +2,11 @@ import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, X } from 'lucide-react';
 import type { City, Clinic, ClinicFilters, ClinicType } from '../types';
-import { CLINIC_TYPE_LABELS } from '../types';
 import { applyClinicFilters, paginate, sortItems } from '../services';
 import { useClinics } from '../contexts/ClinicContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { cn, formatPrice } from '../lib/utils';
+import { cn, formatPrice, getClinicTypeLabel } from '../lib/utils';
+import type { TranslationKey } from '../i18n';
 import SearchBar from '../components/ui/SearchBar';
 import Dropdown from '../components/ui/Dropdown';
 import ClinicCard from '../components/ui/ClinicCard';
@@ -286,14 +286,14 @@ interface ActiveChip {
 function buildActiveChips(
   filters: ClinicFilters,
   specialtyNames: Record<string, string>,
-  t: (key: 'onlyOpenNow' | 'onlyEmergency') => string,
+  t: (key: TranslationKey) => string,
 ): ActiveChip[] {
   const chips: ActiveChip[] = [];
 
   if (filters.query) chips.push({ key: 'query', label: `„${filters.query}"` });
   if (filters.city && filters.city !== 'all') chips.push({ key: 'city', label: filters.city });
   if (filters.type && filters.type !== 'all') {
-    chips.push({ key: 'type', label: CLINIC_TYPE_LABELS[filters.type] });
+    chips.push({ key: 'type', label: getClinicTypeLabel(filters.type, t) });
   }
   if (filters.specialtySlug) {
     chips.push({

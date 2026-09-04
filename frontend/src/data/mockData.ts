@@ -19,8 +19,10 @@ export interface DemoAccount {
  * Demo dataset used until the backend is connected.
  *
  * Names, websites, addresses and phone numbers were taken from each clinic's
- * own website. Ratings, review counts, prices and the `isOpenNow` flag are
- * illustrative — they must not be presented as official information.
+ * own website. Ratings, review counts and prices are illustrative — they must
+ * not be presented as official information. The open/closed status is not
+ * stored; it is computed live from each visitor's own clock via
+ * `isClinicOpenNow` in `lib/utils`.
  * Logos are the property of the respective clinics and are used here only to
  * identify them inside the catalogue.
  */
@@ -52,7 +54,7 @@ export const mockClinics: Clinic[] = [
     reviewsCount: 1243,
     specialties: ['cardiologie', 'ortopedie', 'pediatrie', 'analize', 'neurologie'],
     consultationFrom: 600,
-    workingHours: { label: 'Non-stop, 24/7', isOpenNow: true },
+    workingHours: { label: 'Non-stop, 24/7', alwaysOpen: true },
     hasEmergency: true,
     acceptsInsurance: true,
     brandColor: '#008286',
@@ -74,7 +76,13 @@ export const mockClinics: Clinic[] = [
     reviewsCount: 812,
     specialties: ['medicina-familie', 'pediatrie', 'analize', 'oftalmologie', 'cardiologie'],
     consultationFrom: 450,
-    workingHours: { label: 'Lun–Vin, 08:00–19:00 · Sâm, 09:00–14:00', isOpenNow: true },
+    workingHours: {
+      label: 'Lun–Vin, 08:00–19:00 · Sâm, 09:00–14:00',
+      periods: [
+        { days: [1, 2, 3, 4, 5], start: '08:00', end: '19:00' },
+        { days: [6], start: '09:00', end: '14:00' },
+      ],
+    },
     hasEmergency: false,
     acceptsInsurance: true,
     brandColor: '#12a89b',
@@ -96,7 +104,13 @@ export const mockClinics: Clinic[] = [
     reviewsCount: 546,
     specialties: ['medicina-familie', 'analize', 'pediatrie'],
     consultationFrom: 700,
-    workingHours: { label: 'Lun–Vin, 08:00–18:00 · Sâm, 08:00–14:00', isOpenNow: false },
+    workingHours: {
+      label: 'Lun–Vin, 08:00–18:00 · Sâm, 08:00–14:00',
+      periods: [
+        { days: [1, 2, 3, 4, 5], start: '08:00', end: '18:00' },
+        { days: [6], start: '08:00', end: '14:00' },
+      ],
+    },
     hasEmergency: false,
     acceptsInsurance: false,
     brandColor: '#8b5cf6',
@@ -118,7 +132,10 @@ export const mockClinics: Clinic[] = [
     reviewsCount: 389,
     specialties: ['neurologie', 'ortopedie', 'analize'],
     consultationFrom: 550,
-    workingHours: { label: 'Lun–Vin, 08:00–18:00', isOpenNow: true },
+    workingHours: {
+      label: 'Lun–Vin, 08:00–18:00',
+      periods: [{ days: [1, 2, 3, 4, 5], start: '08:00', end: '18:00' }],
+    },
     hasEmergency: false,
     acceptsInsurance: true,
     brandColor: '#1d4ed8',
@@ -140,7 +157,13 @@ export const mockClinics: Clinic[] = [
     reviewsCount: 271,
     specialties: ['analize', 'medicina-familie', 'cardiologie'],
     consultationFrom: 350,
-    workingHours: { label: 'Lun–Vin, 07:00–17:00 · Sâm, 08:00–13:00', isOpenNow: true },
+    workingHours: {
+      label: 'Lun–Vin, 07:00–17:00 · Sâm, 08:00–13:00',
+      periods: [
+        { days: [1, 2, 3, 4, 5], start: '07:00', end: '17:00' },
+        { days: [6], start: '08:00', end: '13:00' },
+      ],
+    },
     hasEmergency: false,
     acceptsInsurance: true,
     brandColor: '#f26f1a',
@@ -162,7 +185,13 @@ export const mockClinics: Clinic[] = [
     reviewsCount: 964,
     specialties: ['stomatologie'],
     consultationFrom: 300,
-    workingHours: { label: 'Lun–Vin, 09:00–20:00 · Sâm, 09:00–15:00', isOpenNow: true },
+    workingHours: {
+      label: 'Lun–Vin, 09:00–20:00 · Sâm, 09:00–15:00',
+      periods: [
+        { days: [1, 2, 3, 4, 5], start: '09:00', end: '20:00' },
+        { days: [6], start: '09:00', end: '15:00' },
+      ],
+    },
     hasEmergency: false,
     acceptsInsurance: false,
     brandColor: '#c9a227',

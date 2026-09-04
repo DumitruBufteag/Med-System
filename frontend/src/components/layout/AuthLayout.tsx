@@ -17,9 +17,9 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
   const { t } = useLanguage();
 
   const highlights = [
-    { icon: CalendarCheck, text: 'Programările tale, într-un singur loc' },
-    { icon: BadgeCheck, text: 'Clinici verificate din toată țara' },
-    { icon: ShieldCheck, text: 'Datele tale rămân confidențiale' },
+    { icon: CalendarCheck, text: t('authHighlight1') },
+    { icon: BadgeCheck, text: t('authHighlight2') },
+    { icon: ShieldCheck, text: t('authHighlight3') },
   ];
 
   return (
@@ -36,9 +36,7 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
         </Link>
 
         <div>
-          <h2 className="max-w-md text-3xl font-bold leading-tight">
-            Catalogul clinicilor private din Republica Moldova
-          </h2>
+          <h2 className="max-w-md text-3xl font-bold leading-tight">{t('authBrandHeading')}</h2>
           <ul className="mt-8 space-y-4">
             {highlights.map((item) => (
               <li key={item.text} className="flex items-center gap-3 text-white/85">
@@ -52,7 +50,7 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
         </div>
 
         <p className="text-sm text-white/60">
-          © {new Date().getFullYear()} MedGid Moldova. Proiect de practică.
+          © {new Date().getFullYear()} {t('projectFooterNote')}
         </p>
       </aside>
 

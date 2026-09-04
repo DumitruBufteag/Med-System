@@ -47,8 +47,11 @@ export default function LoginPage() {
     clearError();
     if (!validate()) return;
 
-    const succeeded = await login(email, password);
-    if (succeeded) navigate(from, { replace: true });
+    const signedInUser = await login(email, password);
+    if (!signedInUser) return;
+
+    const destination = signedInUser.role === 'admin' && from === '/' ? '/admin' : from;
+    navigate(destination, { replace: true });
   }
 
   function fillDemoAccount(demoEmail: string, demoPassword: string) {
@@ -98,7 +101,7 @@ export default function LoginPage() {
           type="email"
           value={email}
           autoComplete="email"
-          placeholder="nume@exemplu.md"
+          placeholder={t('emailPlaceholderExample')}
           error={fieldErrors.email}
           onChange={(event) => setEmail(event.target.value)}
         />

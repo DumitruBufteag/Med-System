@@ -1,4 +1,5 @@
 import type { Clinic, ClinicFilters } from '../types';
+import { isClinicOpenNow } from '../lib/utils';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -83,7 +84,7 @@ export function applyClinicFilters(clinics: Clinic[], filters: ClinicFilters): C
     result = result.filter((clinic) => clinic.consultationFrom <= filters.maxPrice!);
   }
   if (filters.openNow) {
-    result = result.filter((clinic) => clinic.workingHours.isOpenNow);
+    result = result.filter((clinic) => isClinicOpenNow(clinic.workingHours));
   }
   if (filters.hasEmergency) {
     result = result.filter((clinic) => clinic.hasEmergency);

@@ -13,12 +13,19 @@ import {
   ShieldX,
   Star,
 } from 'lucide-react';
-import { CLINIC_TYPE_LABELS } from '../types';
 import { getDoctorsByClinic, getReviewsByClinic } from '../services';
-import { useServiceData } from '../hooks';
+import { useServiceData, useNow } from '../hooks';
 import { useClinics } from '../contexts/ClinicContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { cn, formatPrice, formatRating } from '../lib/utils';
+import {
+  cn,
+  dateLocale,
+  formatPrice,
+  formatRating,
+  getClinicTypeLabel,
+  isClinicOpenNow,
+  translateWorkingHours,
+} from '../lib/utils';
 import ClinicLogo from '../components/ui/ClinicLogo';
 import SpecialtyIcon from '../components/ui/SpecialtyIcon';
 import Spinner from '../components/ui/Spinner';
@@ -26,7 +33,8 @@ import EmptyState from '../components/ui/EmptyState';
 
 export default function ClinicDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const now = useNow();
   const { clinics, specialties, isLoading } = useClinics();
 
   const clinic = clinics.find((item) => item.slug === slug);
@@ -59,6 +67,7 @@ export default function ClinicDetailPage() {
     );
   }
 
+  const isOpen = isClinicOpenNow(clinic.workingHours, now);
   const clinicSpecialties = specialties.filter((specialty) =>
     clinic.specialties.includes(specialty.slug),
   );
@@ -91,15 +100,21 @@ export default function ClinicDetailPage() {
 
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="badge-muted">{CLINIC_TYPE_LABELS[clinic.type]}</span>
+                <span className="badge-muted">{getClinicTypeLabel(clinic.type, t)}</span>
                 {clinic.hasEmergency && (
                   <span className="badge-danger">
                     <Plus size={12} strokeWidth={3} />
                     {t('emergency')}
                   </span>
                 )}
-                <span className={clinic.workingHours.isOpenNow ? 'badge-success' : 'badge-muted'}>
-                  {clinic.workingHours.isOpenNow ? t('openNow') : t('closed')}
+                <span className={cn('gap-1.5', isOpen ? 'badge-success' : 'badge-muted')}>
+                  <span
+                    className={cn(
+                      'h-1.5 w-1.5 shrink-0 rounded-full',
+                      isOpen ? 'bg-success-500' : 'bg-surface-400',
+                    )}
+                  />
+                  {isOpen ? t('openNow') : t('closed')}
                 </span>
               </div>
 
@@ -121,7 +136,7 @@ export default function ClinicDetailPage() {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock size={15} className="text-surface-300" />
-                  {clinic.workingHours.label}
+                  {translateWorkingHours(clinic.workingHours.label, language)}
                 </span>
               </div>
             </div>
@@ -228,7 +243,7 @@ export default function ClinicDetailPage() {
                           {review.authorName}
                         </strong>
                         <time className="text-xs text-surface-400" dateTime={review.createdAt}>
-                          {new Date(review.createdAt).toLocaleDateString('ro-MD')}
+                          {new Date(review.createdAt).toLocaleDateString(dateLocale(language))}
                         </time>
                       </div>
                       <div className="mb-2 flex gap-0.5">
@@ -349,7 +364,7 @@ export default function ClinicDetailPage() {
                         {t('schedule')}
                       </dt>
                       <dd className="text-surface-700 dark:text-surface-300">
-                        {clinic.workingHours.label}
+                        {translateWorkingHours(clinic.workingHours.label, language)}
                       </dd>
                     </div>
                   </div>

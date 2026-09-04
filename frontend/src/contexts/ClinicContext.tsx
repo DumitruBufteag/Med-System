@@ -8,6 +8,7 @@ import {
 } from 'react';
 import type { Clinic, Specialty } from '../types';
 import { getClinics, getSpecialties } from '../services';
+import { translate } from '../i18n';
 
 interface ClinicContextType {
   /** The whole catalogue. Pages narrow it down with `applyClinicFilters`. */
@@ -48,7 +49,7 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
       setClinics(clinicResult.data ?? []);
       setError(null);
     } else {
-      setError(clinicResult.error ?? 'Nu am putut încărca clinicile.');
+      setError(clinicResult.error ?? translate('errLoadClinics'));
     }
 
     if (specialtyResult.success) {

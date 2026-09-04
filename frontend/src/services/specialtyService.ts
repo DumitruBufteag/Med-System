@@ -3,6 +3,7 @@ import { mockSpecialties } from '../data/mockData';
 import { extractServiceError, mapSpecialtyFromApi } from './apiMappers';
 import { getApiClient } from './httpClient';
 import { USE_MOCK_DATA, mockDelay } from './config';
+import { translate } from '../i18n';
 
 export async function getSpecialties(): Promise<ServiceResponse<Specialty[]>> {
   if (USE_MOCK_DATA) {
@@ -17,7 +18,7 @@ export async function getSpecialties(): Promise<ServiceResponse<Specialty[]>> {
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut încărca specialitățile.'),
+      error: extractServiceError(error, translate('errLoadSpecialties')),
     };
   }
 }

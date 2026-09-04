@@ -12,18 +12,20 @@ import {
   Wallet,
 } from 'lucide-react';
 import type { City, ClinicType } from '../types';
-import { CLINIC_TYPE_LABELS } from '../types';
 import { mockReviews, mockStats } from '../data/mockData';
 import { useClinics } from '../contexts/ClinicContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { containerVariants, itemVariants } from '../lib/animations';
-import { cn } from '../lib/utils';
+import { cn, getClinicTypeLabel } from '../lib/utils';
 import SearchBar from '../components/ui/SearchBar';
+import GradientText from '../components/ui/GradientText';
+import CountUp from '../components/ui/CountUp';
 import ClinicCard from '../components/ui/ClinicCard';
 import SpecialtyCard from '../components/ui/SpecialtyCard';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
+import heroImage from '../assets/hero/clinic-doctor.jpg';
 
 const quickTags = ['Cardiologie', 'Stomatologie', 'Analize', 'Pediatrie', 'RMN'];
 
@@ -69,12 +71,15 @@ export default function HomePage() {
 
             <motion.h1
               variants={itemVariants}
-              className="mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight text-surface-900 sm:text-5xl lg:text-[3.4rem] dark:text-white"
+              className="mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.4rem]"
             >
-              {t('heroTitle')}{' '}
-              <span className="bg-gradient-to-r from-primary-600 to-success-500 bg-clip-text text-transparent">
-                {t('heroTitleAccent')}
-              </span>
+              <GradientText
+                className="gradient-text-heading"
+                colors={['#0e86ad', '#10b981', '#7bcae0', '#0e86ad']}
+                animationSpeed={6}
+              >
+                {t('heroTitle')} {t('heroTitleAccent')}
+              </GradientText>
             </motion.h1>
 
             <motion.p
@@ -106,18 +111,24 @@ export default function HomePage() {
 
             <motion.ul
               variants={itemVariants}
-              className="mt-10 flex flex-wrap gap-x-10 gap-y-5 border-t border-surface-200 pt-7 dark:border-surface-800"
+              className="mt-10 flex flex-wrap gap-x-12 gap-y-6 border-t border-surface-200 pt-8 dark:border-surface-800"
             >
               {[
-                { value: `${mockStats.clinicsCount}+`, label: 'clinici private' },
-                { value: `${mockStats.doctorsCount}+`, label: 'medici verificați' },
-                { value: `${mockStats.specialtiesCount}`, label: 'specialități' },
-              ].map((stat) => (
+                { to: mockStats.clinicsCount, suffix: '+', label: t('statClinics') },
+                { to: mockStats.doctorsCount, suffix: '+', label: t('statDoctors') },
+                { to: mockStats.specialtiesCount, suffix: '', label: t('statSpecialties') },
+              ].map((stat, index) => (
                 <li key={stat.label}>
-                  <strong className="block text-2xl font-extrabold tracking-tight text-surface-900 dark:text-white">
-                    {stat.value}
+                  <strong className="flex items-baseline text-4xl font-extrabold tracking-tight text-surface-900 sm:text-5xl dark:text-white">
+                    <CountUp
+                      to={stat.to}
+                      duration={1.5}
+                      delay={0.1 * index}
+                      separator=","
+                    />
+                    {stat.suffix}
                   </strong>
-                  <span className="text-sm text-surface-500 dark:text-surface-400">
+                  <span className="mt-1 block text-sm text-surface-500 dark:text-surface-400">
                     {stat.label}
                   </span>
                 </li>
@@ -125,78 +136,21 @@ export default function HomePage() {
             </motion.ul>
           </motion.div>
 
-          {/* Illustrative booking card */}
+          {/* Hero image */}
           <motion.aside
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
             className="relative mx-auto w-full max-w-md"
-            aria-label="Exemplu de programare"
+            aria-hidden="true"
           >
-            <div className="card p-6 shadow-xl">
-              <header className="flex items-center gap-3.5 border-b border-surface-200 pb-5 dark:border-surface-800">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 font-bold text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
-                  DM
-                </span>
-                <div>
-                  <strong className="block text-base text-surface-900 dark:text-white">
-                    Dr. Daniela Moraru
-                  </strong>
-                  <small className="text-surface-500 dark:text-surface-400">
-                    Cardiolog · Medpark
-                  </small>
-                </div>
-              </header>
-
-              <ul className="my-5 grid grid-cols-3 gap-2.5">
-                {[
-                  { time: '09:00', state: 'taken' },
-                  { time: '10:30', state: 'free' },
-                  { time: '11:15', state: 'active' },
-                  { time: '13:00', state: 'free' },
-                  { time: '15:45', state: 'taken' },
-                  { time: '16:30', state: 'free' },
-                ].map((slot) => (
-                  <li
-                    key={slot.time}
-                    className={cn(
-                      'rounded-lg border py-2.5 text-center text-sm font-semibold',
-                      slot.state === 'active' &&
-                        'border-primary-600 bg-primary-600 text-white',
-                      slot.state === 'free' &&
-                        'border-surface-200 text-surface-700 dark:border-surface-700 dark:text-surface-300',
-                      slot.state === 'taken' &&
-                        'border-surface-200 bg-surface-50 text-surface-300 line-through dark:border-surface-800 dark:bg-surface-800/50 dark:text-surface-600',
-                    )}
-                  >
-                    {slot.time}
-                  </li>
-                ))}
-              </ul>
-
-              <Link to="/programare" className="btn-primary w-full">
-                Confirmă programarea
-                <ArrowRight size={17} />
-              </Link>
-            </div>
-
-            <div className="card absolute -left-4 -top-5 flex items-center gap-2.5 px-4 py-3 shadow-lg sm:-left-8">
-              <Star size={16} className="fill-warning-500 text-warning-500" />
-              <div>
-                <strong className="block text-sm text-surface-900 dark:text-white">4.8 / 5</strong>
-                <small className="text-xs text-surface-500">peste 9 000 de recenzii</small>
-              </div>
-            </div>
-
-            <div className="card absolute -bottom-5 -right-3 flex items-center gap-2.5 px-4 py-3 shadow-lg sm:-right-6">
-              <Clock size={16} className="text-success-500" />
-              <div>
-                <strong className="block text-sm text-surface-900 dark:text-white">
-                  Urgențe 24/7
-                </strong>
-                <small className="text-xs text-surface-500">14 clinici deschise acum</small>
-              </div>
-            </div>
+            <img
+              src={heroImage}
+              alt=""
+              width={900}
+              height={1125}
+              className="aspect-[4/5] w-full rounded-3xl object-cover shadow-xl ring-1 ring-black/5 dark:ring-white/10"
+            />
           </motion.aside>
         </div>
       </section>
@@ -246,7 +200,7 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label="Tip clinică">
+          <div className="mt-8 flex flex-wrap gap-2" role="tablist" aria-label={t('clinicType')}>
             {typeFilters.map((type) => (
               <button
                 key={type}
@@ -261,7 +215,7 @@ export default function HomePage() {
                     : 'border-surface-200 bg-white text-surface-500 hover:border-primary-300 hover:text-primary-700 dark:border-surface-800 dark:bg-surface-900 dark:text-surface-400',
                 )}
               >
-                {type === 'all' ? 'Toate' : CLINIC_TYPE_LABELS[type]}
+                {type === 'all' ? t('allTypes') : getClinicTypeLabel(type, t)}
               </button>
             ))}
           </div>
@@ -301,26 +255,14 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="section-eyebrow">{t('howItWorks')}</span>
-            <h2 className="section-title mt-3">Trei pași până la consultație</h2>
+            <h2 className="section-title mt-3">{t('howItWorksHeading')}</h2>
           </div>
 
           <ol className="grid gap-6 md:grid-cols-3">
             {[
-              {
-                icon: Search,
-                title: 'Caută',
-                text: 'Filtrează clinicile după oraș, specialitate, preț sau program de lucru.',
-              },
-              {
-                icon: Star,
-                title: 'Compară',
-                text: 'Vezi recenziile pacienților, serviciile oferite și tarifele orientative.',
-              },
-              {
-                icon: CalendarCheck,
-                title: 'Programează-te',
-                text: 'Alege ora liberă și primești confirmarea pe e-mail sau SMS.',
-              },
+              { icon: Search, title: t('stepSearchTitle'), text: t('stepSearchText') },
+              { icon: Star, title: t('stepCompareTitle'), text: t('stepCompareText') },
+              { icon: CalendarCheck, title: t('stepBookTitle'), text: t('stepBookText') },
             ].map((step, index) => (
               <li key={step.title} className="card relative p-7">
                 <span className="absolute right-6 top-5 text-5xl font-extrabold leading-none tracking-tighter text-primary-100 dark:text-primary-500/15">
@@ -339,21 +281,9 @@ export default function HomePage() {
 
           <ul className="mt-6 grid gap-6 md:grid-cols-3">
             {[
-              {
-                icon: BadgeCheck,
-                title: 'Informații verificate',
-                text: 'Fiecare clinică este validată înainte de publicare, iar datele sunt actualizate periodic.',
-              },
-              {
-                icon: Clock,
-                title: 'Economisești timp',
-                text: 'Fără apeluri telefonice repetate — vezi într-un singur loc unde există locuri libere.',
-              },
-              {
-                icon: Wallet,
-                title: 'Prețuri transparente',
-                text: 'Tarife orientative pentru consultații și investigații, afișate înainte de programare.',
-              },
+              { icon: BadgeCheck, title: t('homeBenefit1Title'), text: t('homeBenefit1Text') },
+              { icon: Clock, title: t('homeBenefit2Title'), text: t('homeBenefit2Text') },
+              { icon: Wallet, title: t('homeBenefit3Title'), text: t('homeBenefit3Text') },
             ].map((benefit) => (
               <li key={benefit.title} className="card flex gap-4 p-6">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400">
@@ -375,7 +305,7 @@ export default function HomePage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-10 max-w-2xl text-center">
-            <span className="section-eyebrow">Recenzii</span>
+            <span className="section-eyebrow">{t('reviewsEyebrow')}</span>
             <h2 className="section-title mt-3">{t('reviewsTitle')}</h2>
           </div>
 
@@ -412,13 +342,8 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start justify-between gap-8 rounded-3xl bg-gradient-to-br from-primary-950 via-primary-700 to-success-600 px-8 py-12 shadow-xl sm:px-12 lg:flex-row lg:items-center">
             <div className="max-w-2xl">
-              <h2 className="text-3xl font-bold tracking-tight text-white">
-                Ești o clinică privată din Moldova?
-              </h2>
-              <p className="mt-3 text-white/80">
-                Adaugă-ți instituția în catalog, gestionează programările online și ajungi la
-                pacienți din toată țara.
-              </p>
+              <h2 className="text-3xl font-bold tracking-tight text-white">{t('ctaHeading')}</h2>
+              <p className="mt-3 text-white/80">{t('ctaText')}</p>
             </div>
 
             <div className="flex w-full shrink-0 flex-col gap-3 sm:w-auto sm:flex-row">
@@ -426,7 +351,7 @@ export default function HomePage() {
                 to="/inregistrare-clinica"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-primary-700 transition-transform hover:-translate-y-0.5"
               >
-                Înregistrează clinica
+                {t('ctaRegisterClinic')}
                 <ArrowRight size={17} />
               </Link>
               <Link
@@ -434,7 +359,7 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-white/50 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
               >
                 <Phone size={17} />
-                Vorbește cu noi
+                {t('ctaTalkToUs')}
               </Link>
             </div>
           </div>

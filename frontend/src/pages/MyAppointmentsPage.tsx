@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useClinics } from '../contexts/ClinicContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { TranslationKey } from '../i18n';
+import { dateLocale } from '../lib/utils';
 import ClinicLogo from '../components/ui/ClinicLogo';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
@@ -22,7 +23,7 @@ const statusStyles: Record<AppointmentStatus, { className: string; labelKey: Tra
 };
 
 export default function MyAppointmentsPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user } = useAuth();
   const { clinics } = useClinics();
 
@@ -108,7 +109,7 @@ export default function MyAppointmentsPage() {
               <li className="flex items-center gap-1.5">
                 <CalendarClock size={15} className="text-primary-600" />
                 <time dateTime={`${appointment.date}T${appointment.time}`}>
-                  {new Date(appointment.date).toLocaleDateString('ro-MD', {
+                  {new Date(appointment.date).toLocaleDateString(dateLocale(language), {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric',

@@ -1,8 +1,10 @@
 import type { Doctor, ServiceResponse } from '../types';
-import { mockClinics, mockDoctors } from '../data/mockData';
+import { mockDoctors } from '../data/mockData';
 import { extractServiceError, mapDoctorFromApi } from './apiMappers';
 import { getApiClient } from './httpClient';
 import { USE_MOCK_DATA, mockDelay } from './config';
+import { translate } from '../i18n';
+import { loadClinics } from './clinicService';
 
 /** Every doctor in the catalogue, for building id → doctor lookups. */
 export async function getDoctors(): Promise<ServiceResponse<Doctor[]>> {
@@ -18,7 +20,7 @@ export async function getDoctors(): Promise<ServiceResponse<Doctor[]>> {
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut încărca medicii.'),
+      error: extractServiceError(error, translate('errLoadDoctors')),
     };
   }
 }
@@ -29,7 +31,7 @@ export async function getDoctorsByClinic(slug: string): Promise<ServiceResponse<
 
   if (USE_MOCK_DATA) {
     await mockDelay();
-    const clinic = mockClinics.find((item) => item.slug === slug);
+    const clinic = loadClinics().find((item) => item.slug === slug);
     return {
       success: true,
       data: clinic ? mockDoctors.filter((doctor) => doctor.clinicId === clinic.id) : [],
@@ -43,7 +45,7 @@ export async function getDoctorsByClinic(slug: string): Promise<ServiceResponse<
   } catch (error) {
     return {
       success: false,
-      error: extractServiceError(error, 'Nu am putut încărca echipa medicală.'),
+      error: extractServiceError(error, translate('errLoadTeam')),
     };
   }
 }

@@ -18,18 +18,18 @@ export default function Footer() {
     {
       title: t('forClinics'),
       links: [
-        { label: 'Înregistrare clinică', to: '/inregistrare-clinica' },
-        { label: 'Panou de administrare', to: '/admin' },
-        { label: 'Tarife', to: '/tarife' },
-        { label: 'Suport', to: '/suport' },
+        { label: t('footerRegisterClinic'), to: '/inregistrare-clinica' },
+        { label: t('footerAdminPanel'), to: '/admin' },
+        { label: t('footerPricing'), to: '/tarife' },
+        { label: t('footerSupport'), to: '/suport' },
       ],
     },
     {
       title: t('about'),
       links: [
-        { label: 'Despre proiect', to: '/despre' },
-        { label: 'Termeni și condiții', to: '/termeni' },
-        { label: 'Confidențialitate', to: '/confidentialitate' },
+        { label: t('footerAboutProject'), to: '/despre' },
+        { label: t('footerTerms'), to: '/termeni' },
+        { label: t('footerPrivacy'), to: '/confidentialitate' },
         { label: t('contact'), to: '/contact' },
       ],
     },
@@ -57,7 +57,7 @@ export default function Footer() {
             </li>
             <li className="flex items-center gap-2.5">
               <MapPin size={16} className="text-primary-400" />
-              Chișinău, Republica Moldova
+              {t('footerLocation')}
             </li>
           </ul>
         </div>
@@ -81,7 +81,7 @@ export default function Footer() {
       </div>
 
       <div className="mx-auto flex max-w-7xl flex-wrap justify-between gap-3 border-t border-white/10 px-4 py-6 text-xs text-surface-500 sm:px-6 lg:px-8">
-        <small>© {new Date().getFullYear()} MedGid Moldova. Proiect de practică.</small>
+        <small>© {new Date().getFullYear()} {t('projectFooterNote')}</small>
         <small>{t('disclaimer')}</small>
       </div>
     </footer>

@@ -8,6 +8,7 @@ import {
 } from 'react';
 import type { Clinic, Specialty } from '../types';
 import { getClinics, getSpecialties } from '../services';
+import { getErrorStatus } from '../services/serviceErrors';
 import { translate } from '../i18n';
 
 interface ClinicContextType {
@@ -18,6 +19,8 @@ interface ClinicContextType {
   specialtyNames: Record<string, string>;
   isLoading: boolean;
   error: string | null;
+  /** HTTP-like status behind `error`, so pages can show a 500 page instead of an inline notice. */
+  errorStatus: number | null;
   refresh: () => Promise<void>;
 }
 
@@ -35,12 +38,23 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
   const [specialtyNames, setSpecialtyNames] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
 
   const load = useCallback(async (isCurrent: () => boolean = () => true) => {
-    const [clinicResult, specialtyResult] = await Promise.all([
-      getClinics(),
-      getSpecialties(),
-    ]);
+    let clinicResult: Awaited<ReturnType<typeof getClinics>>;
+    let specialtyResult: Awaited<ReturnType<typeof getSpecialties>>;
+
+    try {
+      [clinicResult, specialtyResult] = await Promise.all([getClinics(), getSpecialties()]);
+    } catch (thrown) {
+      // A service that throws (a mock outage, a network failure) is reported
+      // with its status, so the page can render the matching error screen.
+      if (!isCurrent()) return;
+      setError(thrown instanceof Error ? thrown.message : translate('errLoadClinics'));
+      setErrorStatus(getErrorStatus(thrown) ?? 500);
+      setIsLoading(false);
+      return;
+    }
 
     // A newer request may have started while this one was in flight.
     if (!isCurrent()) return;
@@ -48,8 +62,10 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
     if (clinicResult.success) {
       setClinics(clinicResult.data ?? []);
       setError(null);
+      setErrorStatus(null);
     } else {
       setError(clinicResult.error ?? translate('errLoadClinics'));
+      setErrorStatus(clinicResult.status ?? null);
     }
 
     if (specialtyResult.success) {
@@ -81,7 +97,7 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
 
   return (
     <ClinicContext.Provider
-      value={{ clinics, specialties, specialtyNames, isLoading, error, refresh }}
+      value={{ clinics, specialties, specialtyNames, isLoading, error, errorStatus, refresh }}
     >
       {children}
     </ClinicContext.Provider>

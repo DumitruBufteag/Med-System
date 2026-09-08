@@ -144,6 +144,8 @@ export interface ServiceResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+  /** HTTP-like status on failure (401, 403, 404, 500), when the caller needs it. */
+  status?: number;
 }
 
 /** Result returned by authentication operations (login / register). */
@@ -238,6 +240,14 @@ export interface ClinicInputDTO {
   schedule: ClinicScheduleInput;
 }
 
+/** Payload sent when an admin creates or edits a doctor. */
+export interface DoctorInputDTO {
+  name: string;
+  specialtySlug: string;
+  clinicId: string;
+  yearsOfExperience: number;
+}
+
 // ─── Constants ──────────────────────────────────────────────────
 
 /** Every clinic type, in display order. */
@@ -268,8 +278,10 @@ export const STORAGE_KEYS = {
   USERS: 'users',
   APPOINTMENTS: 'appointments',
   CLINICS: 'clinics',
+  DOCTORS: 'doctors',
   THEME: 'theme',
   LANGUAGE: 'language',
   RECENT_SEARCHES: 'recentSearches',
   FAVOURITE_CLINICS: 'favouriteClinics',
+  SIMULATE_SERVER_ERROR: 'simulateServerError',
 } as const;

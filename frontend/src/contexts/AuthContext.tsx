@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { RegisterDTO, User } from '../types';
 import { loginUser, logoutUser, registerUser, restoreSession } from '../services/authService';
 import { translate } from '../i18n';
@@ -18,7 +19,8 @@ interface AuthContextType {
   /** Resolves to the signed-in user, or `null` on failure — lets callers branch on role. */
   login: (email: string, password: string) => Promise<User | null>;
   register: (dto: RegisterDTO) => Promise<boolean>;
-  logout: () => void;
+  /** Ends the session and leaves the protected area, home by default. */
+  logout: (redirectTo?: string) => void;
   /** Replaces the session user after a profile edit. */
   setUser: (user: User) => void;
   clearError: () => void;
@@ -31,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => restoreSession());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const login = useCallback(async (email: string, password: string) => {
     setError(null);
@@ -64,10 +67,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   }, []);
 
-  const logout = useCallback(() => {
-    logoutUser();
-    setUser(null);
-  }, []);
+  // Signing out from a protected page would otherwise leave the guard rendering
+  // a 401 for a visitor who simply left on purpose, so the session ends with a
+  // move away from that page.
+  const logout = useCallback(
+    (redirectTo = '/') => {
+      logoutUser();
+      setUser(null);
+      navigate(redirectTo, { replace: true });
+    },
+    [navigate],
+  );
 
   const clearError = useCallback(() => setError(null), []);
 

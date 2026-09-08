@@ -3,7 +3,8 @@ import { STORAGE_KEYS } from '../types';
 import { mockClinics } from '../data/mockData';
 import { extractServiceError, mapClinicFromApi } from './apiMappers';
 import { getApiClient } from './httpClient';
-import { USE_MOCK_DATA, mockDelay } from './config';
+import { USE_MOCK_DATA, mockDelay, simulateBackendFailure } from './config';
+import { getErrorStatus } from './serviceErrors';
 import { applyClinicFilters } from './filterService';
 import { translate } from '../i18n';
 import { getInitials, slugify } from '../lib/utils';
@@ -68,6 +69,7 @@ export async function getClinics(
 ): Promise<ServiceResponse<Clinic[]>> {
   if (USE_MOCK_DATA) {
     await mockDelay();
+    simulateBackendFailure();
     return { success: true, data: applyClinicFilters(loadClinics(), filters) };
   }
 
@@ -78,6 +80,7 @@ export async function getClinics(
   } catch (error) {
     return {
       success: false,
+      status: getErrorStatus(error) ?? undefined,
       error: extractServiceError(error, translate('errLoadClinics')),
     };
   }
@@ -86,6 +89,7 @@ export async function getClinics(
 export async function getFeaturedClinics(limit = 6): Promise<ServiceResponse<Clinic[]>> {
   if (USE_MOCK_DATA) {
     await mockDelay();
+    simulateBackendFailure();
     const featured = [...loadClinics()].sort((a, b) => b.rating - a.rating).slice(0, limit);
     return { success: true, data: featured };
   }

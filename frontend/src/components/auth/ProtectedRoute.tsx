@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { ForbiddenPage, UnauthorizedPage } from '../../pages/errors';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -9,22 +9,16 @@ interface ProtectedRouteProps {
 }
 
 /**
- * Sends anonymous visitors to the login page, remembering where they were
- * heading so they land back there once signed in.
+ * Guards a route on two levels: anonymous visitors get a 401 page with a way to
+ * sign in, signed-in users without the required role get a 403 instead — the
+ * protected page itself is never rendered in either case.
  */
 export default function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuth();
-  const location = useLocation();
 
-  if (!isAuthenticated) {
-    return (
-      <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />
-    );
-  }
+  if (!isAuthenticated) return <UnauthorizedPage />;
 
-  if (role && user?.role !== role) {
-    return <Navigate to="/" replace />;
-  }
+  if (role && user?.role !== role) return <ForbiddenPage />;
 
   return <>{children}</>;
 }

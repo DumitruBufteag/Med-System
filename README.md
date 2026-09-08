@@ -5,7 +5,8 @@ Catalogul clinicilor și spitalelor private din Republica Moldova: căutare dup�
 
 Proiect de practică. Structura repozitoriului urmează modelul din
 [finance-tracker](https://github.com/nikkjke/finance-tracker): frontend-ul stă în
-`frontend/`, iar proiectele de backend vor fi adăugate ca directoare surori.
+`frontend/`, iar proiectele de backend sunt directoare surori, grupate în
+soluția `MedGid.sln`.
 
 ## Stack
 
@@ -15,9 +16,61 @@ Proiect de practică. Structura repozitoriului urmează modelul din
 | Icons    | lucide-react                                                    |
 | Animații | framer-motion                                                   |
 | HTTP     | axios                                                           |
-| Backend  | _urmează_ (ASP.NET Core, după modelul din finance-tracker)      |
+| Backend  | ASP.NET Core 8 (Web API), EF Core 8, Npgsql                     |
+| Bază de date | PostgreSQL 16 (docker-compose)                              |
+| Auth     | JWT Bearer, parole hash-uite cu BCrypt                          |
 
 ## Rulare
+
+Sunt trei lucruri de pornit, în ordinea asta.
+
+**1. Baza de date**
+
+```bash
+cp .env.example .env     # o singură dată, apoi pune-ți propria parolă
+docker compose up -d     # PostgreSQL pe localhost:5433
+```
+
+> Portul gazdă este `5433`, nu cel implicit `5432`, pentru că acesta din urmă era
+> deja ocupat de alt proiect. Dacă la tine e liber, schimbă `POSTGRES_PORT` din
+> `.env` și portul din connection string (pasul următor).
+
+**2. Secretele API-ului**
+
+Nici connection string-ul, nici cheia JWT nu stau în fișiere urmărite de git.
+În dezvoltare le ții în **User Secrets**, adică într-un fișier din profilul tău de
+utilizator, în afara repozitoriului. Se setează o singură dată:
+
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" \
+  "Host=localhost;Port=5433;Database=medgid;Username=postgres;Password=<parola din .env>" \
+  --project MedGid.API
+
+dotnet user-secrets set "Jwt:Key" "<minim 32 de caractere>" --project MedGid.API
+```
+
+Verifici cu `dotnet user-secrets list --project MedGid.API`. Dacă lipsesc, API-ul
+refuză să pornească și îți scrie în consolă exact comanda de mai sus.
+
+În producție nu folosești User Secrets, ci variabile de mediu — ASP.NET Core le
+citește din același `IConfiguration`, deci codul rămâne neschimbat:
+
+```
+ConnectionStrings__DefaultConnection=...
+Jwt__Key=...
+```
+
+**3. API-ul**
+
+```bash
+dotnet run --project MedGid.API
+```
+
+Pornește pe `http://localhost:5200`. La prima rulare aplică migrările și
+populează baza cu catalogul demonstrativ (aceleași clinici care erau în
+`mockData.ts`). Swagger UI se deschide chiar în rădăcină: <http://localhost:5200>.
+
+**4. Frontend-ul**
 
 ```bash
 cd frontend
@@ -29,31 +82,92 @@ npm run lint     # eslint
 
 ## Conturi demo
 
-Cât timp `VITE_USE_MOCK_DATA=true`, conturile sunt ținute în `localStorage` și sunt
-create automat la prima autentificare. Sunt afișate și pe pagina de login:
+Aceleași două conturi există în ambele moduri: în baza de date, populate de
+`DatabaseSeeder` cu parolele hash-uite BCrypt, și în `localStorage` cât timp
+`VITE_USE_MOCK_DATA=true`. Sunt afișate și pe pagina de login:
 
 | E-mail | Parolă | Rol |
 | --- | --- | --- |
 | `pacient@medgid.md` | `pacient123` | patient |
 | `admin@medgid.md` | `admin123` | admin |
 
-Înregistrarea creează conturi noi tot local (rol `patient`). Pentru a reveni la
-starea inițială, șterge cheile `users`, `currentUser`, `jwt_token` și
-`appointments` din `localStorage` (DevTools → Application → Local Storage).
+Înregistrarea creează conturi noi cu rolul `patient` — rolurile `admin` și
+`clinic` se atribuie doar din baza de date, niciodată din formularul de sign-up.
 
-> Parolele sunt trecute prin SHA-256 înainte de a fi salvate, ca să nu stea în
-> clar pe disc — dar aceasta **nu** este securitate reală: hash-ul se calculează
-> în browser. Hashing-ul propriu-zis (bcrypt/Argon2, cu salt, pe server) vine
-> odată cu backend-ul.
+Pentru a reveni la starea inițială: `docker compose down -v` șterge baza (se
+repopulează la următoarea pornire a API-ului), iar în modul mock se șterg cheile
+`users`, `currentUser`, `jwt_token` și `appointments` din `localStorage`
+(DevTools → Application → Local Storage).
 
 ## Variabile de mediu
 
-Copiază `frontend/.env.example` în `frontend/.env` și ajustează:
+Rădăcina repozitoriului are un `.env` **ignorat de git**, cu datele de conectare la
+baza de date (`.env.example` arată forma). Docker compose îl citește singur la
+`docker compose up`. Nimic din el nu ajunge pe GitHub.
+
+`frontend/.env` este, dimpotrivă, commit-uit intenționat: conține doar un URL de
+localhost și un flag, niciun secret, iar astfel proiectul merge imediat după clone.
 
 | Variabilă             | Implicit                | Descriere                                                   |
 | --------------------- | ----------------------- | ----------------------------------------------------------- |
 | `VITE_API_BASE_URL`   | `http://localhost:5200` | Adresa API-ului                                              |
-| `VITE_USE_MOCK_DATA`  | `true`                  | Cât timp e `true`, serviciile citesc din `src/data/mockData` |
+| `VITE_USE_MOCK_DATA`  | `false`                 | Pe `true`, serviciile citesc din `src/data/mockData` în loc de API |
+
+Ambele moduri sunt păstrate intenționat: interfața poate fi arătată și fără
+backend pornit, iar serviciile au exact aceleași semnături în ambele cazuri.
+
+## Structura backend-ului
+
+Trei straturi cerute (`API`, `BusinessLayer`, `Domain`) plus `DataAccess`,
+exact ca în finance-tracker. Referințele merg într-un singur sens:
+`API → BusinessLayer → DataAccess → Domain`.
+
+```
+MedGid.sln
+├── MedGid.Domain/              # fără dependențe
+│   ├── Entities/               # UserData, ClinicData, DoctorData, ... (ce se salvează)
+│   ├── Models/                 # DTO-urile (ce circulă prin HTTP), grupate pe domeniu
+│   └── Exceptions/             # BusinessRuleException (poartă propriul status code)
+├── MedGid.DataAccess/
+│   ├── Context/MedGidDbContext.cs
+│   ├── DbSession.cs            # connection string-ul, setat o dată de API
+│   ├── Migrations/
+│   └── Seed/DatabaseSeeder.cs  # catalogul demonstrativ, doar în tabele goale
+├── MedGid.BusinessLayer/
+│   ├── BusinessLogic.cs        # fabrica: singura poartă spre stratul de business
+│   ├── Interfaces/             # IClinicAction, IAuthAction, ...
+│   ├── Core/                   # logica propriu-zisă (metode ...ActionExecution)
+│   └── Structure/              # leagă Core de Interfaces
+└── MedGid.API/
+    ├── Controllers/            # 7 controllere + o bază comună
+    ├── Middleware/             # traduce excepțiile în { status, message }
+    └── Program.cs              # CORS, JWT, Swagger, migrare la pornire
+```
+
+### Endpoint-uri
+
+Rutele sunt cele pe care serviciile din frontend le apelau deja.
+
+| Metodă | Rută | Acces |
+| --- | --- | --- |
+| POST | `/api/auth/login`, `/api/auth/register` | public |
+| GET | `/api/clinics/getAll`, `getFeatured`, `getBySlug/{slug}`, `getById/{id}` | public |
+| POST/PUT/DELETE | `/api/clinics/create`, `update/{id}`, `delete/{id}` | admin |
+| GET | `/api/doctors/getAll`, `getByClinic/{slug}`, `getById/{id}` | public |
+| POST/PUT/DELETE | `/api/doctors/create`, `update/{id}`, `delete/{id}` | admin |
+| GET | `/api/specialties/getAll`, `/api/reviews/getByClinic/{slug}` | public |
+| GET | `/api/appointments/getTakenSlots` | public |
+| GET | `/api/appointments/getByPatient/{id}` | propriul cont sau admin |
+| GET | `/api/appointments/getAll` | admin |
+| POST/PUT | `/api/appointments/create`, `cancel/{id}` | autentificat |
+| GET/DELETE | `/api/users/getAll`, `delete/{id}` | admin |
+| PUT | `/api/users/updateProfile/{id}`, `changePassword/{id}` | propriul cont |
+
+Codurile de status sunt cele așteptate: `200`/`201`/`204` la succes, `400` la
+validare, `401` fără token, `403` fără rol, `404` inexistent, `409` la conflict
+(e-mail deja folosit, interval deja rezervat, medic cu programări active).
+Orice eroare are același corp — `{ "status": 409, "message": "..." }` — ca
+interceptorul de axios să-l poată citi uniform.
 
 ## Structura frontend-ului
 
@@ -91,7 +205,9 @@ Convenții păstrate din finance-tracker:
 - [x] Profil editabil (`/profil`) — date personale și schimbarea parolei
 - [x] Programări (`/programare`) și „Programările mele" (`/programarile-mele`) — rute
       protejate, programările în `localStorage`
-- [ ] Backend
+- [x] Backend: soluție .NET în 4 proiecte, PostgreSQL, JWT, Swagger, CORS
+- [x] Frontend conectat la API prin axios provider cu interceptoare de request și response
+- [x] Secretele scoase din fișierele urmărite de git (User Secrets / variabile de mediu)
 
 > Datele afișate sunt parțial demonstrative. Denumirile, adresele, telefoanele și
 > site-urile clinicilor provin de pe paginile lor oficiale; ratingurile, numărul de

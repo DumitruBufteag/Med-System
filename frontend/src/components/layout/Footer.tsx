@@ -16,15 +16,6 @@ export default function Footer() {
       ],
     },
     {
-      title: t('forClinics'),
-      links: [
-        { label: t('footerRegisterClinic'), to: '/inregistrare-clinica' },
-        { label: t('footerAdminPanel'), to: '/admin' },
-        { label: t('footerPricing'), to: '/tarife' },
-        { label: t('footerSupport'), to: '/suport' },
-      ],
-    },
-    {
       title: t('about'),
       links: [
         { label: t('footerAboutProject'), to: '/despre' },

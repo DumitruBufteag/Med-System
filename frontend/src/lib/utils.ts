@@ -56,6 +56,50 @@ export function dateLocale(language: Language): string {
   return language === 'en' ? 'en-US' : 'ro-MD';
 }
 
+/**
+ * Formats a date as "YYYY-MM-DD" **in the visitor's own time zone**.
+ *
+ * `toISOString().slice(0, 10)` looks like it does the same thing, but it
+ * converts to UTC first: east of Greenwich, any time before 02:00 or 03:00 local
+ * lands on the previous day. Booking a visit for yesterday is exactly the kind
+ * of bug that only shows up early in the morning, so the parts are read off the
+ * local calendar instead.
+ */
+export function toISODate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+/** Today in "YYYY-MM-DD", local. */
+export function todayISO(): string {
+  return toISODate(new Date());
+}
+
+/**
+ * Reads a "YYYY-MM-DD" string into a local `Date` at midnight.
+ *
+ * `new Date("2026-09-15")` is parsed as UTC midnight and then shown in local
+ * time, which shifts the day backwards in western time zones; passing the parts
+ * separately keeps the date the one that was written. Returns null for anything
+ * that is not a real calendar day, so callers never get an Invalid Date.
+ */
+export function parseISODate(value: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return null;
+
+  const [, year, month, day] = match.map(Number);
+  const date = new Date(year, month - 1, day);
+
+  // Rejects impossible days such as 2026-02-31, which would otherwise roll over
+  // silently into March.
+  const isRealDate =
+    date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+
+  return isRealDate ? date : null;
+}
+
 /** Translates the "Lun–Vin" / "Sâm" day abbreviations used in mock working hours. */
 export function translateWorkingHours(label: string, language: Language): string {
   if (language !== 'en') return label;

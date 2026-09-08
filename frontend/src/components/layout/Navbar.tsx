@@ -158,7 +158,7 @@ export default function Navbar() {
                 </Link>
                 <button
                   type="button"
-                  className="btn-secondary"
+                  className="btn-secondary !border-danger-200 !text-danger-600 hover:!bg-danger-50 dark:!border-danger-500/30 dark:!text-danger-400 dark:hover:!bg-danger-500/10"
                   onClick={() => {
                     setIsOpen(false);
                     logout();

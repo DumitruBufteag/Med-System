@@ -20,5 +20,20 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+
+# .NET build output
+[Bb]in/
+[Oo]bj/
+*.user
+
+# Database credentials, read by docker compose. Only the root .env is ignored:
+# frontend/.env holds nothing but a localhost URL and a feature flag, so it is
+# committed on purpose to keep the project runnable straight after a clone.
+/.env
+!/.env.example
+
+# Local overrides of appsettings.json. The committed appsettings.json holds no
+# secrets at all: the connection string and the JWT key come from User Secrets
+# in development and from environment variables in production (see README.md).
+MedGid.API/appsettings.Local.json

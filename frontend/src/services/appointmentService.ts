@@ -25,7 +25,11 @@ export const TIME_SLOTS = [
 
 // ─── Local store (mock mode) ────────────────────────────────────
 
-function readAppointments(): Appointment[] {
+/**
+ * Reads the stored appointments. Exported so `doctorService` can check whether
+ * a doctor still has bookings before removing them.
+ */
+export function loadAppointments(): Appointment[] {
   const raw = localStorage.getItem(STORAGE_KEYS.APPOINTMENTS);
   if (!raw) return [];
 
@@ -68,7 +72,7 @@ export async function getTakenSlots(
   if (USE_MOCK_DATA) {
     await mockDelay(150);
 
-    const booked = readAppointments()
+    const booked = loadAppointments()
       .filter(
         (appointment) =>
           appointment.doctorId === doctorId &&
@@ -100,7 +104,7 @@ export async function createAppointment(
   if (USE_MOCK_DATA) {
     await mockDelay();
 
-    const appointments = readAppointments();
+    const appointments = loadAppointments();
     const isTaken = appointments.some(
       (appointment) =>
         appointment.doctorId === dto.doctorId &&
@@ -143,7 +147,7 @@ export async function cancelAppointment(id: string): Promise<ServiceResponse<App
   if (USE_MOCK_DATA) {
     await mockDelay();
 
-    const appointments = readAppointments();
+    const appointments = loadAppointments();
     const target = appointments.find((appointment) => appointment.id === id);
 
     if (!target) return { success: false, error: translate('errAppointmentNotFound') };
@@ -172,7 +176,7 @@ export async function getAppointmentsByPatient(
 ): Promise<ServiceResponse<Appointment[]>> {
   if (USE_MOCK_DATA) {
     await mockDelay();
-    const appointments = readAppointments()
+    const appointments = loadAppointments()
       .filter((appointment) => appointment.patientId === patientId)
       .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`));
 
@@ -194,7 +198,7 @@ export async function getAppointmentsByPatient(
 export async function getAllAppointments(): Promise<ServiceResponse<Appointment[]>> {
   if (USE_MOCK_DATA) {
     await mockDelay();
-    const appointments = readAppointments().sort((a, b) =>
+    const appointments = loadAppointments().sort((a, b) =>
       `${b.date}${b.time}`.localeCompare(`${a.date}${a.time}`),
     );
 

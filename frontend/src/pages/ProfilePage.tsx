@@ -152,17 +152,19 @@ export default function ProfilePage() {
       </header>
 
       {/* Account summary */}
-      <div className="card mb-6 flex flex-wrap items-center gap-4 p-6">
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xl font-bold text-white">
-          {getInitials(user.name)}
-        </span>
-        <div className="min-w-0 flex-1">
-          <strong className="block truncate text-lg text-surface-900 dark:text-white">
-            {user.name}
-          </strong>
-          <small className="block truncate text-sm text-surface-500">{user.email}</small>
+      <div className="card mb-6 flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 items-center gap-4">
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xl font-bold text-white">
+            {getInitials(user.name)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <strong className="block truncate text-lg text-surface-900 dark:text-white">
+              {user.name}
+            </strong>
+            <small className="block truncate text-sm text-surface-500">{user.email}</small>
+          </div>
         </div>
-        <dl className="flex gap-6 text-sm">
+        <dl className="flex gap-6 text-sm sm:ml-auto sm:shrink-0">
           <div>
             <dt className="text-xs font-semibold uppercase tracking-wide text-surface-400">
               {t('accountRole')}

@@ -19,7 +19,14 @@ export {
 
 export { getSpecialties } from './specialtyService';
 
-export { getDoctors, getDoctorsByClinic } from './doctorService';
+export {
+  getDoctors,
+  getDoctorsByClinic,
+  getDoctorById,
+  createDoctor,
+  updateDoctor,
+  deleteDoctor,
+} from './doctorService';
 
 export { getReviewsByClinic } from './reviewService';
 

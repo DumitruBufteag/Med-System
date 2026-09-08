@@ -154,6 +154,10 @@ export const translations = {
     chooseClinicFirst: 'Alege mai întâi clinica',
     noDoctorsForClinic: 'Această clinică nu are încă medici în catalog.',
     date: 'Data',
+    selectDate: 'Alege data',
+    todayShortcut: 'Astăzi',
+    previousMonth: 'Luna anterioară',
+    nextMonth: 'Luna următoare',
     availableSlots: 'Ore disponibile',
     noSlotsAvailable: 'Nu mai sunt ore libere în ziua aleasă.',
     chooseDoctorAndDate: 'Alege medicul și data ca să vezi orele libere.',
@@ -244,6 +248,26 @@ export const translations = {
     notFoundTitle: 'Pagina nu a fost găsită',
     notFoundText: 'Adresa accesată nu există sau a fost mutată.',
 
+    // Error pages (401 / 403 / 500)
+    err401Label: 'Eroare 401',
+    err401Title: 'Trebuie să fii autentificat',
+    err401Text:
+      'Această pagină este disponibilă doar utilizatorilor autentificați. Conectează-te și te aducem înapoi aici.',
+    err403Label: 'Eroare 403',
+    err403Title: 'Acces interzis',
+    err403Text:
+      'Contul tău nu are permisiunea necesară pentru această zonă. Panoul de administrare este rezervat administratorilor.',
+    err403RoleNote: 'Ești autentificat ca {role}, iar acest serviciu nu îți este disponibil.',
+    err403SwitchAccount: 'Intră cu alt cont',
+    err500Label: 'Eroare 500',
+    err500Title: 'Eroare internă de server',
+    err500Text:
+      'Serviciul nu a putut procesa cererea. Încearcă din nou peste câteva momente — dacă problema persistă, contactează-ne.',
+    err500ServiceMessage: 'Serviciul mock a returnat o eroare internă (500).',
+    roleNamePatient: 'pacient',
+    roleNameClinic: 'reprezentant de clinică',
+    roleNameAdmin: 'administrator',
+
     // Footer / auth layout
     footerRegisterClinic: 'Înregistrare clinică',
     footerAdminPanel: 'Panou de administrare',
@@ -258,6 +282,85 @@ export const translations = {
     authHighlight2: 'Clinici verificate din toată țara',
     authHighlight3: 'Datele tale rămân confidențiale',
     authBrandHeading: 'Catalogul clinicilor private din Republica Moldova',
+
+    // About page
+    aboutHeading: 'Despre proiectul MedGid',
+    aboutSubtitle:
+      'Un catalog digital care adună informațiile despre clinicile private din Republica Moldova într-un singur loc, simplu de căutat și de folosit.',
+    aboutMissionTitle: 'Misiunea noastră',
+    aboutMissionText:
+      'Ne dorim ca fiecare pacient să găsească rapid o clinică potrivită nevoilor sale — după specialitate, oraș sau preț — și să se poată programa online, fără telefoane și așteptare.',
+    aboutStoryTitle: 'Povestea proiectului',
+    aboutStoryText:
+      'MedGid a pornit ca proiect de practică, cu scopul de a exersa dezvoltarea unei aplicații web complete: catalog de clinici, autentificare, programări online și panou de administrare pentru clinici. Datele afișate momentan au caracter demonstrativ.',
+    aboutValuesTitle: 'Ce ne ghidează',
+    aboutValue1Title: 'Transparență',
+    aboutValue1Text:
+      'Informații clare despre specialități, prețuri orientative și program de lucru, fără costuri ascunse.',
+    aboutValue2Title: 'Simplitate',
+    aboutValue2Text: 'O experiență de căutare și programare rapidă, gândită pentru toate vârstele.',
+    aboutValue3Title: 'Încredere',
+    aboutValue3Text:
+      'Recenzii reale ale pacienților și date verificate despre fiecare clinică din catalog.',
+    aboutTeamTitle: 'Echipa din spatele proiectului',
+    aboutTeamText:
+      'Suntem un proiect realizat în cadrul unei practici de dezvoltare software, cu accent pe React, TypeScript și integrarea cu un API propriu.',
+    aboutContactTitle: 'Ai întrebări despre proiect?',
+    aboutContactText: 'Scrie-ne oricând, revenim cu un răspuns cât mai curând.',
+
+    // Terms page
+    termsHeading: 'Termeni și condiții',
+    termsSubtitle:
+      'Regulile de utilizare a platformei MedGid. Prin accesarea și folosirea site-ului, ești de acord cu termenii de mai jos.',
+    termsLastUpdated: 'Ultima actualizare: septembrie 2026',
+    termsIntroTitle: '1. Despre platformă',
+    termsIntroText:
+      'MedGid este un catalog online de clinici și centre medicale private din Republica Moldova, dezvoltat ca proiect de practică. Platforma oferă informații despre clinici, specialități și posibilitatea de a solicita programări online.',
+    termsAccountTitle: '2. Contul de utilizator',
+    termsAccountText:
+      'Pentru a face o programare este nevoie de un cont. Ești responsabil pentru păstrarea confidențialității datelor de autentificare și pentru orice acțiune realizată din contul tău.',
+    termsBookingTitle: '3. Programările online',
+    termsBookingText:
+      'O programare făcută prin MedGid reprezintă o solicitare transmisă către clinica selectată. Confirmarea finală a programării poate fi realizată de clinică prin telefon sau e-mail.',
+    termsContentTitle: '4. Conținutul afișat',
+    termsContentText:
+      'Informațiile despre clinici (prețuri, program, specialități) au scop orientativ și pot fi actualizate. MedGid nu garantează acuratețea absolută a datelor introduse de clinici și recomandă confirmarea directă a detaliilor importante.',
+    termsLiabilityTitle: '5. Limitarea răspunderii',
+    termsLiabilityText:
+      'MedGid nu oferă servicii medicale și nu este responsabil pentru calitatea actului medical prestat de clinicile listate. Platforma facilitează doar accesul la informații și programări.',
+    termsIntellectualTitle: '6. Proprietate intelectuală',
+    termsIntellectualText:
+      'Conținutul, designul și codul sursă al platformei sunt protejate și nu pot fi reproduse fără acordul autorilor proiectului.',
+    termsChangesTitle: '7. Modificarea termenilor',
+    termsChangesText:
+      'Acești termeni pot fi actualizați periodic. Continuarea folosirii platformei după o modificare reprezintă acceptarea noilor termeni.',
+    termsContactTitle: '8. Contact',
+    termsContactText: 'Pentru întrebări legate de acești termeni, ne poți scrie prin pagina de contact.',
+
+    // Privacy page
+    privacyHeading: 'Politica de confidențialitate',
+    privacySubtitle: 'Cum colectăm, folosim și protejăm datele tale atunci când folosești MedGid.',
+    privacyLastUpdated: 'Ultima actualizare: septembrie 2026',
+    privacyDataTitle: '1. Ce date colectăm',
+    privacyDataText:
+      'Colectăm datele oferite direct de tine la crearea contului sau la efectuarea unei programări: nume, e-mail, telefon și, opțional, alte detalii necesare programării.',
+    privacyUseTitle: '2. Cum folosim datele',
+    privacyUseText:
+      'Folosim datele pentru a-ți crea și administra contul, a procesa programările și a-ți oferi suport atunci când ne contactezi.',
+    privacySharingTitle: '3. Partajarea datelor',
+    privacySharingText:
+      'Datele necesare unei programări sunt transmise clinicii selectate. Nu vindem și nu partajăm datele tale cu terți în scopuri de marketing.',
+    privacySecurityTitle: '4. Securitatea datelor',
+    privacySecurityText:
+      'Aplicăm măsuri tehnice rezonabile pentru protejarea datelor stocate, inclusiv autentificare securizată și acces restricționat la panoul de administrare.',
+    privacyRightsTitle: '5. Drepturile tale',
+    privacyRightsText:
+      'Poți solicita oricând accesarea, corectarea sau ștergerea datelor tale personale, contactându-ne prin pagina de contact.',
+    privacyCookiesTitle: '6. Cookie-uri',
+    privacyCookiesText:
+      'Folosim stocarea locală a browserului pentru a reține preferințe precum tema și limba aleasă, fără a urmări comportamentul tău pe alte site-uri.',
+    privacyContactTitle: '7. Contact',
+    privacyContactText: 'Pentru orice întrebare privind datele tale personale, ne poți scrie prin pagina de contact.',
 
     // Home page
     statClinics: 'clinici private',
@@ -356,6 +459,39 @@ export const translations = {
     errDeleteClinicGeneric: 'Nu am putut șterge clinica.',
     errLoadPatients: 'Nu am putut încărca pacienții.',
     errDeletePatientGeneric: 'Nu am putut șterge pacientul.',
+
+    // Admin — doctors
+    adminNavDoctors: 'Medici',
+    adminDoctorsTitle: 'Administrare medici',
+    adminDoctorsSubtitle: 'Adaugă, editează sau elimină medicii din echipele clinicilor.',
+    adminDoctorFormHint:
+      'Medicul apare imediat pe pagina clinicii și în lista de programare online.',
+    addDoctor: 'Adaugă medic',
+    editDoctorTitle: 'Editează medicul',
+    saveDoctor: 'Salvează medicul',
+    adminNoDoctors: 'Nu există medici înregistrați.',
+    searchDoctorsPlaceholder: 'Caută medic sau specialitate…',
+    confirmDeleteDoctor: 'Sigur ștergi medicul „{name}"? Acțiunea nu poate fi anulată.',
+    allClinics: 'Toate clinicile',
+    rating: 'Rating',
+    tableDoctor: 'Medic',
+    tableExperience: 'Experiență',
+    yearsShort: '{years} ani',
+    fieldDoctorName: 'Nume medic',
+    fieldYearsOfExperience: 'Ani de experiență',
+    selectClinicPlaceholder: 'Alege clinica',
+    selectSpecialtyPlaceholder: 'Alege specialitatea',
+    selectClinicFirstPlaceholder: 'Alege întâi clinica',
+    clinicHasNoSpecialties: 'Clinica selectată nu are nicio specialitate configurată.',
+    errDoctorNotFound: 'Medicul nu a fost găsit.',
+    errDoctorNameTaken: 'Această clinică are deja un medic cu acest nume.',
+    errDoctorHasAppointments:
+      'Medicul are {count} programări active. Anulează-le înainte de a-l șterge.',
+    errDeleteDoctorGeneric: 'Nu am putut șterge medicul.',
+    errDoctorNameRequired: 'Introdu numele medicului.',
+    errDoctorClinicRequired: 'Alege clinica medicului.',
+    errDoctorSpecialtyRequired: 'Alege specialitatea medicului.',
+    errDoctorExperienceInvalid: 'Introdu un număr de ani între 0 și 70.',
 
     // Admin — layout & navigation
     adminNavDashboard: 'Tablou de bord',
@@ -578,6 +714,10 @@ export const translations = {
     chooseClinicFirst: 'Choose a clinic first',
     noDoctorsForClinic: 'This clinic has no doctors in the catalogue yet.',
     date: 'Date',
+    selectDate: 'Pick a date',
+    todayShortcut: 'Today',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
     availableSlots: 'Available times',
     noSlotsAvailable: 'No free times left on the selected day.',
     chooseDoctorAndDate: 'Pick a doctor and a date to see the free times.',
@@ -668,6 +808,26 @@ export const translations = {
     notFoundTitle: 'Page not found',
     notFoundText: 'The page you tried to reach does not exist or has been moved.',
 
+    // Error pages (401 / 403 / 500)
+    err401Label: '401 error',
+    err401Title: 'You need to be signed in',
+    err401Text:
+      'This page is available to signed-in users only. Sign in and we will bring you back here.',
+    err403Label: '403 error',
+    err403Title: 'Access denied',
+    err403Text:
+      'Your account does not have permission for this area. The admin panel is reserved for administrators.',
+    err403RoleNote: 'You are signed in as {role}, and this service is not available to you.',
+    err403SwitchAccount: 'Sign in with another account',
+    err500Label: '500 error',
+    err500Title: 'Internal server error',
+    err500Text:
+      'The service could not process the request. Try again in a few moments — if the problem persists, contact us.',
+    err500ServiceMessage: 'The mock service returned an internal error (500).',
+    roleNamePatient: 'a patient',
+    roleNameClinic: 'a clinic representative',
+    roleNameAdmin: 'an administrator',
+
     // Footer / auth layout
     footerRegisterClinic: 'Register your clinic',
     footerAdminPanel: 'Admin panel',
@@ -682,6 +842,83 @@ export const translations = {
     authHighlight2: 'Verified clinics from across the country',
     authHighlight3: 'Your data stays confidential',
     authBrandHeading: 'The catalogue of private clinics in the Republic of Moldova',
+
+    // About page
+    aboutHeading: 'About the MedGid project',
+    aboutSubtitle:
+      'A digital catalogue that brings together information about private clinics in the Republic of Moldova in one place, easy to search and use.',
+    aboutMissionTitle: 'Our mission',
+    aboutMissionText:
+      'We want every patient to quickly find a clinic that fits their needs — by specialty, city or price — and to be able to book online, without phone calls and waiting.',
+    aboutStoryTitle: 'The story behind the project',
+    aboutStoryText:
+      'MedGid started as a practice project, built to exercise the development of a complete web application: a clinic catalogue, authentication, online bookings and an admin panel for clinics. The data currently displayed is for demonstration purposes.',
+    aboutValuesTitle: 'What guides us',
+    aboutValue1Title: 'Transparency',
+    aboutValue1Text: 'Clear information about specialties, indicative prices and opening hours, with no hidden costs.',
+    aboutValue2Title: 'Simplicity',
+    aboutValue2Text: 'A fast search and booking experience, designed for all ages.',
+    aboutValue3Title: 'Trust',
+    aboutValue3Text: 'Real patient reviews and verified information about every clinic in the catalogue.',
+    aboutTeamTitle: 'The team behind the project',
+    aboutTeamText:
+      'We are a project built as part of a software development internship, focused on React, TypeScript and integration with a custom API.',
+    aboutContactTitle: 'Have questions about the project?',
+    aboutContactText: "Write to us any time — we'll get back to you as soon as possible.",
+
+    // Terms page
+    termsHeading: 'Terms and conditions',
+    termsSubtitle:
+      'The rules for using the MedGid platform. By accessing and using the site, you agree to the terms below.',
+    termsLastUpdated: 'Last updated: September 2026',
+    termsIntroTitle: '1. About the platform',
+    termsIntroText:
+      'MedGid is an online catalogue of private clinics and medical centres in the Republic of Moldova, built as a practice project. The platform provides information about clinics and specialties, and lets you request online bookings.',
+    termsAccountTitle: '2. User account',
+    termsAccountText:
+      'An account is required to make a booking. You are responsible for keeping your login details confidential and for any action taken from your account.',
+    termsBookingTitle: '3. Online bookings',
+    termsBookingText:
+      'A booking made through MedGid is a request sent to the selected clinic. Final confirmation of the appointment may be made by the clinic by phone or email.',
+    termsContentTitle: '4. Displayed content',
+    termsContentText:
+      'Information about clinics (prices, schedule, specialties) is indicative and may be updated. MedGid does not guarantee the absolute accuracy of data entered by clinics and recommends confirming important details directly.',
+    termsLiabilityTitle: '5. Limitation of liability',
+    termsLiabilityText:
+      'MedGid does not provide medical services and is not responsible for the quality of medical care provided by the listed clinics. The platform only facilitates access to information and bookings.',
+    termsIntellectualTitle: '6. Intellectual property',
+    termsIntellectualText:
+      "The platform's content, design and source code are protected and may not be reproduced without the consent of the project's authors.",
+    termsChangesTitle: '7. Changes to the terms',
+    termsChangesText:
+      'These terms may be updated periodically. Continuing to use the platform after a change means you accept the new terms.',
+    termsContactTitle: '8. Contact',
+    termsContactText: 'For questions about these terms, you can reach us through the contact page.',
+
+    // Privacy page
+    privacyHeading: 'Privacy policy',
+    privacySubtitle: 'How we collect, use and protect your data when you use MedGid.',
+    privacyLastUpdated: 'Last updated: September 2026',
+    privacyDataTitle: '1. What data we collect',
+    privacyDataText:
+      'We collect the data you provide directly when creating an account or making a booking: name, email, phone number and, optionally, other details needed for the appointment.',
+    privacyUseTitle: '2. How we use the data',
+    privacyUseText:
+      'We use the data to create and manage your account, process bookings and provide support when you contact us.',
+    privacySharingTitle: '3. Data sharing',
+    privacySharingText:
+      'The data required for a booking is sent to the selected clinic. We do not sell or share your data with third parties for marketing purposes.',
+    privacySecurityTitle: '4. Data security',
+    privacySecurityText:
+      'We apply reasonable technical measures to protect stored data, including secure authentication and restricted access to the admin panel.',
+    privacyRightsTitle: '5. Your rights',
+    privacyRightsText:
+      'You can request access to, correction of, or deletion of your personal data at any time by contacting us through the contact page.',
+    privacyCookiesTitle: '6. Cookies',
+    privacyCookiesText:
+      'We use browser local storage to remember preferences such as theme and language, without tracking your behaviour on other sites.',
+    privacyContactTitle: '7. Contact',
+    privacyContactText: 'For any question regarding your personal data, you can reach us through the contact page.',
 
     // Home page
     statClinics: 'private clinics',
@@ -776,6 +1013,39 @@ export const translations = {
     errDeleteClinicGeneric: 'We could not delete the clinic.',
     errLoadPatients: 'We could not load the patients.',
     errDeletePatientGeneric: 'We could not delete the patient.',
+
+    // Admin — doctors
+    adminNavDoctors: 'Doctors',
+    adminDoctorsTitle: 'Manage doctors',
+    adminDoctorsSubtitle: 'Add, edit or remove doctors from the clinics’ teams.',
+    adminDoctorFormHint:
+      'The doctor shows up on the clinic page and in the online booking list right away.',
+    addDoctor: 'Add doctor',
+    editDoctorTitle: 'Edit doctor',
+    saveDoctor: 'Save doctor',
+    adminNoDoctors: 'There are no doctors registered.',
+    searchDoctorsPlaceholder: 'Search doctor or specialty…',
+    confirmDeleteDoctor: 'Delete doctor "{name}"? This cannot be undone.',
+    allClinics: 'All clinics',
+    rating: 'Rating',
+    tableDoctor: 'Doctor',
+    tableExperience: 'Experience',
+    yearsShort: '{years} yrs',
+    fieldDoctorName: 'Doctor name',
+    fieldYearsOfExperience: 'Years of experience',
+    selectClinicPlaceholder: 'Choose the clinic',
+    selectSpecialtyPlaceholder: 'Choose the specialty',
+    selectClinicFirstPlaceholder: 'Choose a clinic first',
+    clinicHasNoSpecialties: 'The selected clinic has no specialties configured.',
+    errDoctorNotFound: 'Doctor not found.',
+    errDoctorNameTaken: 'This clinic already has a doctor with that name.',
+    errDoctorHasAppointments:
+      'This doctor has {count} active appointments. Cancel them before deleting.',
+    errDeleteDoctorGeneric: 'We could not delete the doctor.',
+    errDoctorNameRequired: 'Enter the doctor’s name.',
+    errDoctorClinicRequired: 'Choose the doctor’s clinic.',
+    errDoctorSpecialtyRequired: 'Choose the doctor’s specialty.',
+    errDoctorExperienceInvalid: 'Enter a number of years between 0 and 70.',
 
     // Admin — layout & navigation
     adminNavDashboard: 'Dashboard',

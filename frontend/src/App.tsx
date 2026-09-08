@@ -17,15 +17,25 @@ import ClinicDetailPage from './pages/ClinicDetailPage';
 import SpecialtiesPage from './pages/SpecialtiesPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import ContactPage from './pages/ContactPage';
+import AboutPage from './pages/AboutPage';
+import TermsPage from './pages/TermsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import BookingPage from './pages/BookingPage';
 import MyAppointmentsPage from './pages/MyAppointmentsPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import { NotFoundPage } from './pages/errors';
+import {
+  ForbiddenPage,
+  NotFoundPage,
+  ServerErrorPage,
+  UnauthorizedPage,
+} from './pages/errors';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminClinicsPage from './pages/admin/AdminClinicsPage';
 import AdminClinicFormPage from './pages/admin/AdminClinicFormPage';
+import AdminDoctorsPage from './pages/admin/AdminDoctorsPage';
+import AdminDoctorFormPage from './pages/admin/AdminDoctorFormPage';
 import AdminPatientsPage from './pages/admin/AdminPatientsPage';
 import AdminAppointmentsPage from './pages/admin/AdminAppointmentsPage';
 
@@ -33,9 +43,9 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <AxiosProvider>
-        <ThemeProvider>
-          <AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AxiosProvider>
             <LanguageProvider>
               <ClinicProvider>
                 <ErrorBoundary>
@@ -57,8 +67,13 @@ function App() {
                       <Route path="clinici" element={<AdminClinicsPage />} />
                       <Route path="clinici/nou" element={<AdminClinicFormPage />} />
                       <Route path="clinici/:id/editare" element={<AdminClinicFormPage />} />
+                      <Route path="medici" element={<AdminDoctorsPage />} />
+                      <Route path="medici/nou" element={<AdminDoctorFormPage />} />
+                      <Route path="medici/:id/editare" element={<AdminDoctorFormPage />} />
                       <Route path="pacienti" element={<AdminPatientsPage />} />
                       <Route path="programari" element={<AdminAppointmentsPage />} />
+                      {/* Unknown /admin/* address: still guarded, then a 404. */}
+                      <Route path="*" element={<NotFoundPage />} />
                     </Route>
 
                     {/* Public Routes */}
@@ -69,6 +84,9 @@ function App() {
                       <Route path="/specialitati" element={<SpecialtiesPage />} />
                       <Route path="/cum-functioneaza" element={<HowItWorksPage />} />
                       <Route path="/contact" element={<ContactPage />} />
+                      <Route path="/despre" element={<AboutPage />} />
+                      <Route path="/termeni" element={<TermsPage />} />
+                      <Route path="/confidentialitate" element={<PrivacyPage />} />
 
                       {/* These require an account */}
                       <Route
@@ -96,6 +114,13 @@ function App() {
                         }
                       />
 
+                      {/* Error screens, reachable by address: the axios
+                          response interceptor navigates here on a 403, and
+                          the other two are linked from the interface. */}
+                      <Route path="/401" element={<UnauthorizedPage />} />
+                      <Route path="/403" element={<ForbiddenPage />} />
+                      <Route path="/500" element={<ServerErrorPage />} />
+
                       {/* Catch-all: any unknown route → 404 */}
                       <Route path="*" element={<NotFoundPage />} />
                     </Route>
@@ -103,9 +128,9 @@ function App() {
                 </ErrorBoundary>
               </ClinicProvider>
             </LanguageProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </AxiosProvider>
+          </AxiosProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

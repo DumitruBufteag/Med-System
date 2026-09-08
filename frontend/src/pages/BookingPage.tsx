@@ -7,8 +7,9 @@ import { useServiceData } from '../hooks';
 import { useAuth } from '../contexts/AuthContext';
 import { useClinics } from '../contexts/ClinicContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { cn, dateLocale, formatPrice } from '../lib/utils';
+import { cn, dateLocale, formatPrice, toISODate, todayISO } from '../lib/utils';
 import Dropdown from '../components/ui/Dropdown';
+import DatePicker from '../components/ui/DatePicker';
 import ClinicLogo from '../components/ui/ClinicLogo';
 import Spinner from '../components/ui/Spinner';
 
@@ -19,10 +20,8 @@ interface FieldErrors {
   slot?: string;
 }
 
-/** Today in YYYY-MM-DD, used as the earliest bookable day. */
-function today(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+/** How far ahead a visit can be booked. */
+const BOOKING_WINDOW_MONTHS = 6;
 
 export default function BookingPage() {
   const { t, language } = useLanguage();
@@ -32,7 +31,7 @@ export default function BookingPage() {
 
   const [clinicSlug, setClinicSlug] = useState(searchParams.get('clinica') ?? '');
   const [doctorId, setDoctorId] = useState('');
-  const [date, setDate] = useState(today());
+  const [date, setDate] = useState(todayISO);
   const [slot, setSlot] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -40,6 +39,15 @@ export default function BookingPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState<Appointment | null>(null);
+
+  // Recomputed on every render on purpose: a tab left open overnight would
+  // otherwise keep offering yesterday as the earliest bookable day.
+  const minBookingDate = todayISO();
+  const maxBookingDate = useMemo(() => {
+    const limit = new Date();
+    limit.setMonth(limit.getMonth() + BOOKING_WINDOW_MONTHS);
+    return toISODate(limit);
+  }, []);
 
   const clinic = clinics.find((item) => item.slug === clinicSlug);
 
@@ -244,14 +252,16 @@ export default function BookingPage() {
           <label htmlFor="booking-date" className="label">
             {t('date')}
           </label>
-          <input
+          <DatePicker
             id="booking-date"
-            type="date"
-            className="input"
+            label={t('date')}
             value={date}
-            min={today()}
-            onChange={(event) => {
-              setDate(event.target.value);
+            min={minBookingDate}
+            max={maxBookingDate}
+            hasError={Boolean(fieldErrors.date)}
+            onChange={(nextDate) => {
+              setDate(nextDate);
+              // The free times belong to the previous day.
               setSlot('');
             }}
           />

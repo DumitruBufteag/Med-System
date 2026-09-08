@@ -15,6 +15,7 @@ import Pagination from '../components/ui/Pagination';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
 import ErrorState from '../components/ui/ErrorState';
+import { ServerErrorPage } from './errors';
 
 type SortOption = 'rating' | 'price-asc' | 'price-desc' | 'name';
 
@@ -54,7 +55,8 @@ const paramNames: Record<keyof ClinicFilters, string> = {
 
 export default function ClinicsPage() {
   const { t } = useLanguage();
-  const { clinics, specialties, specialtyNames, isLoading, error, refresh } = useClinics();
+  const { clinics, specialties, specialtyNames, isLoading, error, errorStatus, refresh } =
+    useClinics();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
@@ -114,6 +116,12 @@ export default function ClinicsPage() {
     next.set('pagina', String(nextPage));
     setSearchParams(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // A failing catalogue service takes over the whole page: an empty list with
+  // filters on top would suggest the search returned nothing.
+  if (errorStatus === 500) {
+    return <ServerErrorPage detail={error ?? undefined} onRetry={() => void refresh()} />;
   }
 
   const activeChips = buildActiveChips(filters, specialtyNames, t);

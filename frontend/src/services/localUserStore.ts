@@ -94,9 +94,44 @@ export function toPublicUser(stored: StoredUser): User {
   return user;
 }
 
+/** UTF-8 → base64url, the encoding a JWT segment uses. */
+function encodeBase64Url(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join('');
+
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
+ * Builds a token shaped exactly like the one the API signs — same three segments,
+ * same claims — but with a placeholder signature, since the browser has no key.
+ *
+ * It exists so mock mode exercises the real code path: the session is restored by
+ * decoding a token, not by trusting a separate copy of the user, and switching
+ * VITE_USE_MOCK_DATA does not change how authentication behaves. Nothing verifies
+ * this token, which is precisely why mock mode is a demo and not a security model.
+ */
+function issueMockToken(user: User): string {
+  const issuedAt = Math.floor(Date.now() / 1000);
+
+  const header = { alg: 'none', typ: 'JWT' };
+  const payload = {
+    jti: createId(),
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+    iat: issuedAt,
+    exp: issuedAt + 60 * 60,
+    iss: 'MedGidMock',
+    aud: 'MedGidApp',
+  };
+
+  return `${encodeBase64Url(JSON.stringify(header))}.${encodeBase64Url(JSON.stringify(payload))}.mock-signature`;
+}
+
 export function startSession(user: User): void {
-  // Stands in for a real JWT until the backend issues one.
-  localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, `mock.${user.id}.${Date.now()}`);
+  localStorage.setItem(STORAGE_KEYS.JWT_TOKEN, issueMockToken(user));
   localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
 }
 

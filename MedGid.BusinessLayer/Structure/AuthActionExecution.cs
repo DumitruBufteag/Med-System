@@ -13,4 +13,5 @@ public class AuthActionExecution : AuthActions, IAuthAction
 
     public AuthResponseDto? LoginAction(LoginDto dto) => LoginActionExecution(dto);
     public AuthResponseDto RegisterAction(RegisterDto dto) => RegisterActionExecution(dto);
+    public TokenValidationResultDto ValidateToken(string? token) => ValidateTokenExecution(token);
 }

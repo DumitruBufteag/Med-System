@@ -11,6 +11,20 @@ namespace MedGid.BusinessLayer.Core;
 
 public class AuthActions
 {
+    /// <summary>
+    /// The claim names written into the token and read back out of it.
+    ///
+    /// Short, registered names rather than the WS-Federation URIs that
+    /// <see cref="ClaimTypes"/> expands to: the browser decodes this payload to
+    /// condition the interface, and `sub` is far easier to read there than
+    /// `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier`.
+    /// The API mirrors these names in its TokenValidationParameters.
+    /// </summary>
+    public const string UserIdClaim = "sub";
+    public const string EmailClaim = "email";
+    public const string NameClaim = "name";
+    public const string RoleClaim = "role";
+
     private readonly string _jwtKey;
     private readonly string _jwtIssuer;
     private readonly string _jwtAudience;
@@ -70,13 +84,99 @@ public class AuthActions
         return BuildResponse(user);
     }
 
-    private AuthResponseDto BuildResponse(UserData user) => new()
+    /// <summary>
+    /// Runs a token through the same checks the API's bearer middleware applies —
+    /// signature, issuer, audience and lifetime — and reports the claims it holds.
+    /// Never throws: an invalid token is an answer, not a failure.
+    /// </summary>
+    internal TokenValidationResultDto ValidateTokenExecution(string? token)
     {
-        Token = GenerateToken(user),
-        User = user.ToDto()
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return new TokenValidationResultDto { IsValid = false, Error = "Token lipsă." };
+        }
+
+        // A client that copies the whole header instead of the token alone is a
+        // common enough mistake to be worth absorbing here.
+        token = token.Trim();
+        if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            token = token["Bearer ".Length..].Trim();
+        }
+
+        var handler = new JwtSecurityTokenHandler
+        {
+            // Without this the handler renames `sub` to the ClaimTypes URI, and the
+            // lookups below would silently find nothing.
+            MapInboundClaims = false
+        };
+
+        try
+        {
+            var principal = handler.ValidateToken(token, BuildValidationParameters(), out var validated);
+
+            return new TokenValidationResultDto
+            {
+                IsValid = true,
+                UserId = Guid.TryParse(principal.FindFirst(UserIdClaim)?.Value, out var userId) ? userId : null,
+                Email = principal.FindFirst(EmailClaim)?.Value,
+                Name = principal.FindFirst(NameClaim)?.Value,
+                Role = principal.FindFirst(RoleClaim)?.Value,
+                ExpiresAt = validated.ValidTo.ToString("o")
+            };
+        }
+        catch (SecurityTokenExpiredException)
+        {
+            return new TokenValidationResultDto { IsValid = false, Error = "Token expirat." };
+        }
+        catch (SecurityTokenInvalidSignatureException)
+        {
+            return new TokenValidationResultDto { IsValid = false, Error = "Semnătura tokenului nu este validă." };
+        }
+        catch (SecurityTokenException)
+        {
+            // Deliberately not exception.Message: the handler's IDX messages spell
+            // out the configured issuer and audience, and this endpoint is
+            // anonymous, so anyone could read them off a rejected token.
+            return new TokenValidationResultDto { IsValid = false, Error = "Token invalid." };
+        }
+        catch (ArgumentException)
+        {
+            // Not a JWT at all — a truncated or hand-typed string.
+            return new TokenValidationResultDto { IsValid = false, Error = "Tokenul nu are formatul unui JWT." };
+        }
+    }
+
+    /// <summary>Shared by token validation here and by the API's bearer middleware.</summary>
+    private TokenValidationParameters BuildValidationParameters() => new()
+    {
+        ValidateIssuer = true,
+        ValidIssuer = _jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = _jwtAudience,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey)),
+        // Default is five minutes of grace, which would let an expired token keep
+        // working long enough to look like a bug rather than an expiry.
+        ClockSkew = TimeSpan.Zero,
+        NameClaimType = NameClaim,
+        RoleClaimType = RoleClaim
     };
 
-    private string GenerateToken(UserData user)
+    private AuthResponseDto BuildResponse(UserData user)
+    {
+        var expiresAt = DateTime.UtcNow.AddMinutes(_expiresInMinutes);
+
+        return new AuthResponseDto
+        {
+            Token = GenerateToken(user, expiresAt),
+            ExpiresAt = expiresAt.ToString("o"),
+            User = user.ToDto()
+        };
+    }
+
+    private string GenerateToken(UserData user, DateTime expiresAt)
     {
         var credentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey)),
@@ -85,19 +185,17 @@ public class AuthActions
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.Name),
-            // Matches RoleClaimType = "Role" in the API's token validation, which is
-            // what makes [Authorize(Roles = "admin")] work.
-            new Claim("Role", user.Role)
+            new Claim(UserIdClaim, user.Id.ToString()),
+            new Claim(EmailClaim, user.Email),
+            new Claim(NameClaim, user.Name),
+            new Claim(RoleClaim, user.Role)
         };
 
         var token = new JwtSecurityToken(
             issuer: _jwtIssuer,
             audience: _jwtAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_expiresInMinutes),
+            expires: expiresAt,
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

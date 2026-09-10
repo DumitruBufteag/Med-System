@@ -3,6 +3,7 @@ import { STORAGE_KEYS } from '../types';
 import { extractServiceError } from './apiMappers';
 import { getApiClient } from './httpClient';
 import { USE_MOCK_DATA, mockDelay } from './config';
+import { readStoredClaims } from './jwt';
 import { translate } from '../i18n';
 import {
   createId,
@@ -97,14 +98,65 @@ export function logoutUser(): void {
   localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
 }
 
-/** Restores the signed-in user from localStorage after a page reload. */
-export function restoreSession(): User | null {
-  const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-  if (!raw || !localStorage.getItem(STORAGE_KEYS.JWT_TOKEN)) return null;
-
+/** The cached profile, used only to fill in fields the token carries no claim for. */
+function readCachedUser(): User | null {
   try {
-    return JSON.parse(raw) as User;
+    const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    return raw ? (JSON.parse(raw) as User) : null;
   } catch {
     return null;
   }
+}
+
+/**
+ * Rebuilds the signed-in user from the stored token after a page reload.
+ *
+ * The token is the authority on id, e-mail and role — those are claims the server
+ * signed, and the same values the API will enforce on every request. The cached
+ * profile is consulted only for the fields no claim carries, and only when it
+ * belongs to the same account; a leftover copy of a different user is ignored
+ * rather than merged. No token, an unreadable one, or an expired one ends the
+ * session here, so a stale cached user can never outlive the token.
+ */
+export function restoreSession(): User | null {
+  const claims = readStoredClaims();
+  if (!claims) {
+    logoutUser();
+    return null;
+  }
+
+  const cached = readCachedUser();
+  const profile = cached?.id === claims.sub ? cached : null;
+
+  return {
+    id: claims.sub,
+    email: claims.email,
+    name: claims.name ?? profile?.name ?? claims.email,
+    role: claims.role,
+    phone: profile?.phone,
+    avatar: profile?.avatar,
+    createdAt: profile?.createdAt ?? '',
+  };
+}
+
+/**
+ * Asks the API who the stored token belongs to.
+ *
+ * The browser can read a token but not verify it, so this is the only way to
+ * learn that one has been revoked, signed with a different key, or issued to an
+ * account that no longer exists. Also refreshes the profile fields that live in
+ * the database rather than in the claims. Throws on a rejected token — the axios
+ * interceptor turns that 401 into a sign-out.
+ */
+export async function fetchCurrentUser(): Promise<User | null> {
+  if (USE_MOCK_DATA) {
+    // No server to ask; the locally issued token is all there is.
+    return restoreSession();
+  }
+
+  const response = await getApiClient().get('/api/auth/me');
+  const user = response.data as User;
+
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+  return user;
 }

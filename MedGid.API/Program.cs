@@ -1,5 +1,6 @@
 using System.Text;
 using MedGid.API.Middleware;
+using MedGid.BusinessLayer.Core;
 using MedGid.DataAccess;
 using MedGid.DataAccess.Context;
 using MedGid.DataAccess.Seed;
@@ -50,6 +51,11 @@ builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        // Off, so the `sub` and `role` claims AuthActions writes stay under those
+        // names instead of being expanded into the WS-Federation ClaimTypes URIs.
+        // The browser decodes the same payload, and short names are what it reads.
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -59,10 +65,13 @@ builder.Services
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            // Default is five minutes of grace, which would let an expired token
+            // keep working long enough to look like a bug rather than an expiry.
             ClockSkew = TimeSpan.Zero,
-            // Matches the claim AuthActions writes, which is what makes
-            // [Authorize(Roles = "admin")] resolve.
-            RoleClaimType = "Role"
+            // Must match the claims AuthActions writes: this is what makes
+            // [Authorize(Roles = "admin")] and User.Identity.Name resolve.
+            NameClaimType = AuthActions.NameClaim,
+            RoleClaimType = AuthActions.RoleClaim
         };
 
         // The default challenge writes an empty body; the client needs the same

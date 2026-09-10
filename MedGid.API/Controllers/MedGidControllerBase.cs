@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MedGid.BusinessLayer.Core;
 using MedGid.Domain.Models.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ public abstract class MedGidControllerBase : ControllerBase
     {
         get
         {
-            var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var value = User.FindFirstValue(AuthActions.UserIdClaim);
             if (string.IsNullOrEmpty(value) || !Guid.TryParse(value, out var userId))
             {
                 throw new UnauthorizedAccessException("Sesiune invalidă. Autentifică-te din nou.");
@@ -26,6 +27,12 @@ public abstract class MedGidControllerBase : ControllerBase
             return userId;
         }
     }
+
+    /// <summary>The e-mail carried by the token, for endpoints that echo the session back.</summary>
+    protected string? CurrentUserEmail => User.FindFirstValue(AuthActions.EmailClaim);
+
+    /// <summary>The role carried by the token — the same value [Authorize(Roles = ...)] matches on.</summary>
+    protected string? CurrentUserRole => User.FindFirstValue(AuthActions.RoleClaim);
 
     protected bool IsAdmin => User.IsInRole("admin");
 

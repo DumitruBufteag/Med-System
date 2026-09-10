@@ -3,7 +3,21 @@
 //   import { getClinics, getSpecialties, applyClinicFilters } from '@/services';
 // ────────────────────────────────────────────────────────────────
 
-export { loginUser, registerUser, logoutUser, restoreSession } from './authService';
+export {
+  loginUser,
+  registerUser,
+  logoutUser,
+  restoreSession,
+  fetchCurrentUser,
+} from './authService';
+
+export {
+  decodeToken,
+  isExpired,
+  millisecondsUntilExpiry,
+  readStoredToken,
+  readStoredClaims,
+} from './jwt';
 
 export { updateProfile, changePassword, getAllUsers, deleteUser } from './userService';
 
@@ -52,4 +66,5 @@ export { USE_MOCK_DATA } from './config';
 
 // Re-export service-specific types for convenience
 export type { AuthResult } from './authService';
+export type { JwtClaims } from './jwt';
 export type { SortDirection, SortConfig, PaginatedResult } from './filterService';

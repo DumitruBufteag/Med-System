@@ -12,11 +12,18 @@ interface AxiosContextType {
 
 const AxiosContext = createContext<AxiosContextType | undefined>(undefined);
 
-/** A 401 from the sign-in form means "wrong password", not "your session expired". */
-const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/register'];
+/**
+ * Endpoints whose 401 the caller handles itself, so the interceptor leaves it be.
+ *
+ * On the sign-in form a 401 means "wrong password", not "your session expired".
+ * On /me it does mean an expired session, but that check runs on start-up from
+ * whatever page the visitor opened: AuthContext clears the session in place,
+ * rather than throwing someone reading a public page out to the login form.
+ */
+const SELF_HANDLED_401 = ['/api/auth/login', '/api/auth/register', '/api/auth/me'];
 
-function isAuthRequest(url?: string): boolean {
-  return AUTH_ENDPOINTS.some((endpoint) => url?.includes(endpoint));
+function handlesOwn401(url?: string): boolean {
+  return SELF_HANDLED_401.some((endpoint) => url?.includes(endpoint));
 }
 
 /**
@@ -54,7 +61,7 @@ export function AxiosProvider({ children }: { children: ReactNode }) {
         const serviceError = toServiceError(error);
         const requestUrl = (error as { config?: { url?: string } })?.config?.url;
 
-        if (serviceError.status === HTTP_STATUS.UNAUTHORIZED && !isAuthRequest(requestUrl)) {
+        if (serviceError.status === HTTP_STATUS.UNAUTHORIZED && !handlesOwn401(requestUrl)) {
           // The token is missing, expired or no longer accepted. Keeping the
           // stale session would leave the interface showing a signed-in user
           // whose every request fails, so it ends here and the visitor lands on

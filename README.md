@@ -80,25 +80,6 @@ npm run build    # tsc -b && vite build
 npm run lint     # eslint
 ```
 
-## Conturi demo
-
-Aceleași două conturi există în ambele moduri: în baza de date, populate de
-`DatabaseSeeder` cu parolele hash-uite BCrypt, și în `localStorage` cât timp
-`VITE_USE_MOCK_DATA=true`. Sunt afișate și pe pagina de login:
-
-| E-mail | Parolă | Rol |
-| --- | --- | --- |
-| `pacient@medgid.md` | `pacient123` | patient |
-| `admin@medgid.md` | `admin123` | admin |
-
-Înregistrarea creează conturi noi cu rolul `patient` — rolurile `admin` și
-`clinic` se atribuie doar din baza de date, niciodată din formularul de sign-up.
-
-Pentru a reveni la starea inițială: `docker compose down -v` șterge baza (se
-repopulează la următoarea pornire a API-ului), iar în modul mock se șterg cheile
-`users`, `currentUser`, `jwt_token` și `appointments` din `localStorage`
-(DevTools → Application → Local Storage).
-
 ## Variabile de mediu
 
 Rădăcina repozitoriului are un `.env` **ignorat de git**, cu datele de conectare la
